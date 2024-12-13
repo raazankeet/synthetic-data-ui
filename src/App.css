@@ -1,0 +1,101 @@
+body {
+  font-family: "Roboto", Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f5f7fa;
+  color: #333;
+}
+
+.App {
+  text-align: center;
+  padding: 20px;
+}
+
+.app-header {
+  background-color: #0073e6;
+  color: white;
+  padding: 20px;
+  border-radius: 5px;
+}
+
+.subtitle {
+  margin: 5px 0 20px;
+  font-size: 16px;
+}
+
+.input-container {
+  margin: 20px auto;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+input[type="text"] {
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 250px;
+}
+
+button {
+  padding: 10px 15px;
+  font-size: 16px;
+  background-color: #0073e6;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #005bb5;
+}
+
+.table-container {
+  margin: 20px auto;
+  width: 90%;
+  background-color: white;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  padding: 10px;
+  text-align: left;
+}
+
+th {
+  background-color: #f0f4f8;
+}
+
+tr:nth-child(even) {
+  background-color: #f9fbfd;
+}
+
+select {
+  padding: 8px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+.loading-message {
+  font-size: 18px;
+  color: #666;
+}
+
+h2, h3 {
+  margin: 10px 0;
+}
+
+.metadata-container {
+  max-width: 1000px;
+  margin: 0 auto;
+}
