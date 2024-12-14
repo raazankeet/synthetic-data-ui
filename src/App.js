@@ -155,7 +155,7 @@ function App() {
 
   return (
     <div className="App">
-      <h1>Metadata Table Viewer</h1>
+      <h1>Synthetic Data Generator</h1>
 
       <div className="input-container">
         <input
@@ -169,21 +169,42 @@ function App() {
 
       {metadata && (
         <div>
-          <h3>Parent Tables Metadata:</h3>
-          {Object.keys(metadata.parent_tables_metadata).map((tableName) =>
-            renderTable(tableName, metadata.parent_tables_metadata[tableName])
-          )}
 
-          <h3>Central Table Metadata:</h3>
-          {Object.keys(metadata.central_table_metadata).map((tableName) =>
-            renderTable(tableName, metadata.central_table_metadata[tableName])
-          )}
+            {/* Central Table Metadata Section */}
+  {Object.keys(metadata.central_table_metadata).length > 0 && (
+    <div>
+      <h3 className="metadata-title">Central Table Metadata:</h3>
+      {Object.keys(metadata.central_table_metadata).map((tableName) =>
+        renderTable(tableName, metadata.central_table_metadata[tableName])
+      )}
+    </div>
+  )}
+  
+  {/* Parent Tables Metadata Section */}
+  {Object.keys(metadata.parent_tables_metadata).length > 0 && (
+    <div>
+      <h3 className="metadata-title">Parent Tables Metadata:</h3>
+      {Object.keys(metadata.parent_tables_metadata).map((tableName) =>
+        renderTable(tableName, metadata.parent_tables_metadata[tableName])
+      )}
+    </div>
+  )}
 
-          <h3>Child Tables Metadata:</h3>
-          {Object.keys(metadata.child_tables_metadata).map((tableName) =>
-            renderTable(tableName, metadata.child_tables_metadata[tableName])
-          )}
-        </div>
+
+
+  {/* Child Tables Metadata Section */}
+  {Object.keys(metadata.child_tables_metadata).length > 0 && (
+    <div>
+      <h3 className="metadata-title">Child Tables Metadata:</h3>
+      {Object.keys(metadata.child_tables_metadata).map((tableName) =>
+        renderTable(tableName, metadata.child_tables_metadata[tableName])
+      )}
+    </div>
+  )}
+</div>
+
+
+     
       )}
     </div>
   );

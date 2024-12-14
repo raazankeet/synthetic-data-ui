@@ -99,6 +99,7 @@ select {
 
 h2, h3 {
   margin: 5px 0;
+  
 }
 
 .metadata-container {
@@ -230,5 +231,16 @@ input:checked + .slider:before {
 .slider.round:before {
   border-radius: 50%;
 }
+
+.metadata-title {
+  text-align: left;        /* Align text to the left */
+  margin: 10px auto 5px;   /* Top, Center horizontally, Bottom margin */
+  width: 80%;              /* Same width as the table container */
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
+}
+
+
 
 
