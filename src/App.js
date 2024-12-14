@@ -6,8 +6,10 @@ function App() {
   const [metadata, setMetadata] = useState(null); // Metadata response from API
   const [selectedGenerators, setSelectedGenerators] = useState({}); // Track selected generators
   const [expandedTables, setExpandedTables] = useState({}); // Track table collapsible state
-  const [updatePermissions, setUpdatePermissions] = useState({}); // Track update permissions for each table
+  const [generateDataState, setGenerateDataState] = useState({}); // Track generate data state for each table
+  const [recordCounts, setRecordCounts] = useState({}); // Track record counts for each table
 
+  // Fetch metadata from API
   const handleFetchMetadata = () => {
     if (tableName.trim() === "") {
       alert("Please enter a table name!");
@@ -18,31 +20,48 @@ function App() {
       .then((response) => response.json())
       .then((data) => {
         setMetadata(data);
-        // Initialize all tables as collapsed except central
+
+        // Initialize tables and set their states
         setExpandedTables({
-          central: true,
+          central: true, // Always expanded
           ...Object.keys(data.parent_tables_metadata).reduce((acc, table) => {
-            acc[table] = false;
+            acc[table] = false; // Parent tables collapsed by default
             return acc;
           }, {}),
           ...Object.keys(data.child_tables_metadata).reduce((acc, table) => {
-            acc[table] = false;
+            acc[table] = false; // Child tables collapsed by default
             return acc;
           }, {}),
         });
 
-        // Initialize update permissions (disabled by default for all tables)
-        setUpdatePermissions({
+        // Initialize generate data state: All tables start as disabled except central
+        setGenerateDataState({
           ...Object.keys(data.parent_tables_metadata).reduce((acc, table) => {
-            acc[table] = false;
+            acc[table] = false; // Default: disabled
             return acc;
           }, {}),
           ...Object.keys(data.central_table_metadata).reduce((acc, table) => {
-            acc[table] = true; // Central table editable by default
+            acc[table] = true; // Central table is enabled
             return acc;
           }, {}),
           ...Object.keys(data.child_tables_metadata).reduce((acc, table) => {
-            acc[table] = false;
+            acc[table] = false; // Default: disabled
+            return acc;
+          }, {}),
+        });
+
+        // Initialize record counts: Default 10 records for all tables
+        setRecordCounts({
+          ...Object.keys(data.parent_tables_metadata).reduce((acc, table) => {
+            acc[table] = 10; // Default: 10 records
+            return acc;
+          }, {}),
+          ...Object.keys(data.central_table_metadata).reduce((acc, table) => {
+            acc[table] = 10; // Default: 10 records
+            return acc;
+          }, {}),
+          ...Object.keys(data.child_tables_metadata).reduce((acc, table) => {
+            acc[table] = 10; // Default: 10 records
             return acc;
           }, {}),
         });
@@ -50,6 +69,7 @@ function App() {
       .catch((error) => console.error("Error fetching metadata:", error));
   };
 
+  // Toggle the collapse/expand state of a table
   const toggleTable = (tableName) => {
     setExpandedTables((prevState) => ({
       ...prevState,
@@ -57,13 +77,7 @@ function App() {
     }));
   };
 
-  const toggleUpdatePermission = (tableName) => {
-    setUpdatePermissions((prevState) => ({
-      ...prevState,
-      [tableName]: !prevState[tableName],
-    }));
-  };
-
+  // Handle change in selected generator for a specific table and column
   const handleGeneratorChange = (tableName, columnName, generator) => {
     setSelectedGenerators((prevState) => ({
       ...prevState,
@@ -74,23 +88,59 @@ function App() {
     }));
   };
 
+  // Toggle the "Generate Data" switch for a specific table
+  const handleGenerateDataToggle = (tableName) => {
+    setGenerateDataState((prevState) => {
+      const newState = { ...prevState, [tableName]: !prevState[tableName] };
+      // If generating data is disabled, clear the selected generators for that table
+      if (!newState[tableName]) {
+        setSelectedGenerators((prevGenerators) => ({
+          ...prevGenerators,
+          [tableName]: {}, // Clear generators for that table
+        }));
+      }
+      return newState;
+    });
+  };
+
+  // Handle change in the number of records for a specific table
+  const handleRecordCountChange = (tableName, value) => {
+    // Ensure the value is a non-negative number
+    const newValue = Math.max(0, parseInt(value, 10)); // If value is less than 0, it will set to 0
+
+    setRecordCounts((prevState) => ({
+      ...prevState,
+      [tableName]: newValue,
+    }));
+  };
+
+  // Render the table with columns, generators, and other options
   const renderTable = (tableName, tableData) => {
-    const isEditable = updatePermissions[tableName];
+    const isGenerateDataEnabled = generateDataState[tableName]; // Track whether generate data is enabled for this table
 
     return (
       <div key={tableName} className="table-container">
         <div className="table-header">
-        <h2>{capitalizeFirstLetter(tableName)}</h2>
+          <h2>{capitalizeFirstLetter(tableName)}</h2>
           <div className="header-controls">
-            {/* Constant Text "Generate Data" */}
-            <span className="generate-data-text">Generate Data</span>
+            {/* Number of Records Input */}
+            <div className="records-count-container">
+              <span>Records to generate</span>
+              <input
+                type="number"
+                value={recordCounts[tableName] || 10}
+                onChange={(e) => handleRecordCountChange(tableName, e.target.value)}
+                disabled={!isGenerateDataEnabled} // Disable based on table's generate data state
+              />
+            </div>
 
-            {/* Toggle slider */}
+            {/* Generate Data Toggle */}
+            <span className="generate-data-text">Generate Data</span>
             <label className="switch">
               <input
                 type="checkbox"
-                checked={updatePermissions[tableName]}
-                onChange={() => toggleUpdatePermission(tableName)}
+                checked={isGenerateDataEnabled || false}
+                onChange={() => handleGenerateDataToggle(tableName)} // Handle toggle for specific table
               />
               <span className="slider round"></span>
             </label>
@@ -123,54 +173,46 @@ function App() {
                   <td>{column.COLUMN_NAME}</td>
                   <td>{column.DATA_TYPE}</td>
                   <td>
-<select
-  disabled={!isEditable}
-  value={selectedGenerators[tableName]?.[column.COLUMN_NAME] || ""}
-  onChange={(e) =>
-    handleGeneratorChange(tableName, column.COLUMN_NAME, e.target.value)
-  }
-  className={expandedTables[tableName] ? "select-visible" : ""}
->
-  <option value="">Select Generator</option>
-  {[
-    { value: "firstName", label: "First Name" },
-    { value: "lastName", label: "Last Name" },
-    { value: "fullName", label: "Full Name" },
-    { value: "phoneNumber", label: "Phone Number" },
-    { value: "city", label: "City" },
-    { value: "state", label: "State" },
-    { value: "zipcode", label: "Zip Code" },
-    { value: "streetAddress", label: "Street Address" },
-    { value: "fullAddress", label: "Full Address" },
-    { value: "ssn", label: "SSN" },
-    { value: "emailID", label: "Email" },
-    { value: "bookName", label: "Book Name" },
-    { value: "bookAuthor", label: "Book Author" },
-    { value: "weather", label: "Weather" },
-    { value: "temperature", label: "Temperature" },
-    { value: "creditCardNumber", label: "Credit Card Number" },
-    { value: "randomNumber", label: "Random Number" },
-    { value: "artistName", label: "Artist Name" },
-    { value: "regex", label: "Regular Expression (Regex)" },
-    { value: "quotes", label: "Movie Quotes" },
-    { value: "sentences", label: "Sentences" },
-    { value: "ancientGod", label: "Ancient God" },
-    { value: "animalName", label: "Animal Name" },
-    { value: "productName", label: "Product Name" },
-    { value: "catchPhrase", label: "Catchphrase" },
-    { value: "hospitalName", label: "Hospital Name" },
-    { value: "diseaseName", label: "Disease Name" },
-    { value: "medicineName", label: "Medicine Name" },
-    { value: "sha256", label: "SHA 256" },
-    { value: "futureDate", label: "Future Date" },
-    { value: "pastDate", label: "Past Date" },
-  ].map((gen) => (
-    <option key={gen.value} value={gen.value}>
-      {gen.label}
-    </option>
-  ))}
-</select>
-
+                    <select
+                      disabled={!isGenerateDataEnabled} // Disable if Generate Data is off
+                      value={selectedGenerators[tableName]?.[column.COLUMN_NAME] || ""}
+                      onChange={(e) =>
+                        handleGeneratorChange(tableName, column.COLUMN_NAME, e.target.value)
+                      }
+                    >
+                      <option value="">Select Generator</option>
+                      <option value="firstName">First Name</option>
+                      <option value="lastName">Last Name</option>
+                      <option value="fullName">Full Name</option>
+                      <option value="phoneNumber">Phone Number</option>
+                      <option value="city">City</option>
+                      <option value="state">State</option>
+                      <option value="zipcode">Zip Code</option>
+                      <option value="streetAddress">Street Address</option>
+                      <option value="fullAddress">Full Address</option>
+                      <option value="ssn">SSN</option>
+                      <option value="emailID">Email</option>
+                      <option value="bookName">Book Name</option>
+                      <option value="bookAuthor">Book Author</option>
+                      <option value="weather">Weather</option>
+                      <option value="temperature">Temperature</option>
+                      <option value="creditCardNumber">Credit Card Number</option>
+                      <option value="randomNumber">Random Number</option>
+                      <option value="artistName">Artist Name</option>
+                      <option value="regex">Regular Expression (Regex)</option>
+                      <option value="quotes">Movie Quotes</option>
+                      <option value="sentences">Sentences</option>
+                      <option value="ancientGod">Ancient God</option>
+                      <option value="animalName">Animal Name</option>
+                      <option value="productName">Product Name</option>
+                      <option value="catchPhrase">Catchphrase</option>
+                      <option value="hospitalName">Hospital Name</option>
+                      <option value="diseaseName">Disease Name</option>
+                      <option value="medicineName">Medicine Name</option>
+                      <option value="sha256">SHA 256</option>
+                      <option value="futureDate">Future Date</option>
+                      <option value="pastDate">Past Date</option>
+                    </select>
                   </td>
                 </tr>
               ))}
