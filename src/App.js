@@ -105,12 +105,9 @@ function App() {
 
   // Handle change in the number of records for a specific table
   const handleRecordCountChange = (tableName, value) => {
-    // Ensure the value is a non-negative number
-    const newValue = Math.max(0, parseInt(value, 10)); // If value is less than 0, it will set to 0
-
     setRecordCounts((prevState) => ({
       ...prevState,
-      [tableName]: newValue,
+      [tableName]: value,
     }));
   };
 
@@ -125,7 +122,7 @@ function App() {
           <div className="header-controls">
             {/* Number of Records Input */}
             <div className="records-count-container">
-              <span>Records to generate</span>
+              <span>Number of Records</span>
               <input
                 type="number"
                 value={recordCounts[tableName] || 10}
@@ -155,15 +152,14 @@ function App() {
           </div>
         </div>
         <div
-          className={`table-content ${
-            expandedTables[tableName] ? "expanded" : "collapsed"
-          }`}
+          className={`table-content ${expandedTables[tableName] ? "expanded" : "collapsed"}`}
         >
           <table>
             <thead>
               <tr>
                 <th>Column Name</th>
                 <th>Data Type</th>
+                <th>Max Length</th>
                 <th>Generator</th>
               </tr>
             </thead>
@@ -172,6 +168,7 @@ function App() {
                 <tr key={column.COLUMN_NAME}>
                   <td>{column.COLUMN_NAME}</td>
                   <td>{column.DATA_TYPE}</td>
+                  <td>{column.CHARACTER_MAXIMUM_LENGTH || "N/A"}</td>
                   <td>
                     <select
                       disabled={!isGenerateDataEnabled} // Disable if Generate Data is off
@@ -223,6 +220,42 @@ function App() {
     );
   };
 
+  // Function to generate the JSON output
+  const generateJsonOutput = () => {
+    const output = {
+      central_table_metadata: {},
+      parent_tables_metadata: {},
+      child_tables_metadata: {},
+    };
+
+    // Construct output for each table (central, parent, child)
+    const processTable = (tableType, tableMetadata) => {
+      Object.keys(tableMetadata).forEach((tableName) => {
+        const table = tableMetadata[tableName];
+        const tableData = {
+          generate_data: generateDataState[tableName] || false,
+          record_count: recordCounts[tableName] || 10,
+          columns: table.map((column) => ({
+            COLUMN_NAME: column.COLUMN_NAME,
+            DATA_TYPE: column.DATA_TYPE,
+            CHARACTER_MAXIMUM_LENGTH: column.CHARACTER_MAXIMUM_LENGTH,
+            selected_generator: selectedGenerators[tableName]?.[column.COLUMN_NAME] || "",
+            
+          })),
+        };
+        output[tableType][tableName] = tableData;
+      });
+    };
+
+    processTable("central_table_metadata", metadata.central_table_metadata);
+    processTable("parent_tables_metadata", metadata.parent_tables_metadata);
+    processTable("child_tables_metadata", metadata.child_tables_metadata);
+
+    console.log("Generated JSON Output:", JSON.stringify(output, null, 2));
+
+    return JSON.stringify(output, null, 2);
+  };
+
   return (
     <div className="App">
       <h1>Synthetic Data Generator</h1>
@@ -235,6 +268,7 @@ function App() {
           placeholder="Enter table name"
         />
         <button onClick={handleFetchMetadata}>Fetch Metadata</button>
+        <button onClick={generateJsonOutput}>Generate JSON</button> {/* Add Generate JSON button */}
       </div>
 
       {metadata && (
@@ -274,6 +308,7 @@ function App() {
               </div>
             </div>
           )}
+
         </div>
       )}
     </div>
