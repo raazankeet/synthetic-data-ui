@@ -226,9 +226,10 @@ function App() {
       central_table_metadata: {},
       parent_tables_metadata: {},
       child_tables_metadata: {},
+      constraints: [], // Add constraints section
     };
-
-    // Construct output for each table (central, parent, child)
+  
+    // Process table metadata for central, parent, and child tables
     const processTable = (tableType, tableMetadata) => {
       Object.keys(tableMetadata).forEach((tableName) => {
         const table = tableMetadata[tableName];
@@ -240,22 +241,32 @@ function App() {
             DATA_TYPE: column.DATA_TYPE,
             CHARACTER_MAXIMUM_LENGTH: column.CHARACTER_MAXIMUM_LENGTH,
             selected_generator: selectedGenerators[tableName]?.[column.COLUMN_NAME] || "",
-            
           })),
         };
         output[tableType][tableName] = tableData;
       });
     };
-
+  
     processTable("central_table_metadata", metadata.central_table_metadata);
     processTable("parent_tables_metadata", metadata.parent_tables_metadata);
     processTable("child_tables_metadata", metadata.child_tables_metadata);
-
+  
+    // Add constraints to the output
+    if (metadata.constraint_details) {
+      output.constraints = metadata.constraint_details.map((constraint) => ({
+        child_table: constraint.ChildTable,
+        child_column: constraint.ChildColumn,
+        parent_table: constraint.ReferencedTable,
+        parent_column: constraint.ReferencedColumn,
+        constraint_name: constraint.ConstraintName,
+      }));
+    }
+  
     console.log("Generated JSON Output:", JSON.stringify(output, null, 2));
-
+  
     return JSON.stringify(output, null, 2);
   };
-
+  
   return (
     <div className="App">
       <h1>Synthetic Data Generator</h1>
