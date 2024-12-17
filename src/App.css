@@ -63,7 +63,7 @@ button:hover {
 
 .table-container {
   margin: 10px auto;
-  width: 80%;
+  width: 90%;
   background-color: white;
   box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
   border-radius: var(--border-radius); /* Use the border-radius variable */
@@ -85,7 +85,7 @@ th {
 }
 
 tr:nth-child(even) {
-  background-color: #f9fbfd;
+  background-color: #e6effa;
 }
 
 select {
@@ -100,7 +100,7 @@ select {
 }
 
 h2, h3 {
-  margin: 5px 0;
+  margin: 2px 0;
 }
 
 .metadata-container {
@@ -125,7 +125,7 @@ h2, h3 {
   cursor: pointer;
   display: flex;
   justify-content: space-between;
-  border-bottom: 2px solid rgb(220, 220, 220);
+  border-bottom: 1px solid rgb(220, 220, 220);
 }
 
 .collapse-button {
@@ -228,7 +228,7 @@ input:checked + .slider:before {
 .metadata-title {
   text-align: left; /* Align text to the left */
   margin: 10px auto 5px; /* Top, Center horizontally, Bottom margin */
-  width: 80%; /* Same width as the table container */
+  width: 90%; /* Same width as the table container */
   font-size: 18px;
   font-weight: bold;
   color: whitesmoke;
@@ -255,7 +255,7 @@ input:checked + .slider:before {
   padding: 5px;
   width: 80px; /* Adjust width as needed */
   text-align: center;
-  border-radius: 5px;
+  border-radius: 50px;
   border: 1px solid #ccc;
 }
 
@@ -267,7 +267,7 @@ input:checked + .slider:before {
 /* Modify header-controls to ensure proper alignment */
 .header-controls {
   display: flex;
-  gap: 15px; /* Space between elements */
+  gap: 10px; /* Space between elements */
   align-items: center;
   justify-content: flex-start; /* Align items to the start */
 }
@@ -281,9 +281,9 @@ input:checked + .slider:before {
 
 .records-count-container input {
   padding: 5px;
-  width: 80px; /* Adjust width as needed */
+  width: 55px; /* Adjust width as needed */
   text-align: center;
-  border-radius: 5px;
+  border-radius: var(--border-radius);
   border: 1px solid #ccc;
 }
 
@@ -344,4 +344,103 @@ input:checked + .slider:before {
 
 .slider.round:before {
   border-radius: 50%;
+}
+
+.total-rows-container {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* Add space between label and badge */
+}
+
+.current-rows-label {
+  font-weight: bold;
+  color: #555; /* Slightly darker text color */
+}
+
+.current-rows-badge {
+  background-color: #007bff; /* Bootstrap primary color for contrast */
+  color: white;
+  font-weight: bold;
+  padding: 5px 10px;
+  border-radius: 15px;
+  font-size: 0.9rem;
+  display: inline-block;
+  min-width: 50px;
+  text-align: center;
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+/* Styling for the truncate checkbox container */
+.truncate-container {
+  display: flex;
+  align-items: center;
+  margin-top: 10px;
+}
+
+/* Flat style checkbox */
+.truncate-checkbox {
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border: 2px solid #ccc;
+  background-color: white;
+  cursor: pointer;
+  position: relative;
+  margin-right: 10px;
+  vertical-align: middle;
+  transition: border-color 0.3s ease, background-color 0.3s ease;
+}
+
+/* Border color change on hover */
+.truncate-checkbox:hover {
+  border-color: #ff6b6b;
+}
+
+/* Border color change when checked */
+.truncate-checkbox:checked {
+  background-color: #ff6b6b;
+  border-color: #ff6b6b;
+}
+
+/* Add checkmark */
+.truncate-checkbox:checked::after {
+  content: "✓";
+  color: white;
+  font-size: 18px; /* Increased font size for the tick */
+  position: absolute;
+  top: 50%; /* Vertically center */
+  left: 50%; /* Horizontally center */
+  transform: translate(-50%, -50%); /* Adjust to exactly center */
+}
+
+
+
+
+.badges-container {
+  position: absolute;  /* Position badges relative to the td */
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  top: 50%;  /* Center the badges vertically */
+  left: 30px;  /* Adjust the horizontal positioning to move badges a bit right */
+  transform: translateY(-50%);  /* Center the badges vertically */
+  z-index: 2; /* Ensure badges appear above column name */
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding:3px 5px;
+  border-radius: 12px;
+  font-size: 12px;
+}
+
+.primary-key-badge {
+  background-color: #ffcc00;
+  color: #fff;
+}
+
+.nullable-badge {
+  background-color: #f44336;
+  color: #fff;
 }
