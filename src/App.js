@@ -267,7 +267,7 @@ function App() {
         >
           <MaterialReactTable columns={columns} data={tableData.columns}
 
-          enableClickToCopy={true}
+          //enableClickToCopy={true}
           enableColumnPinning={true}
           enableStickyHeader={true}
           enableFullScreenToggle={true} // Enable full-screen toggle
