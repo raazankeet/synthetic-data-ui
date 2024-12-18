@@ -248,14 +248,14 @@ input:checked + .slider:before {
 .records-count-container {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 5px;
 }
 
 .records-count-container input {
   padding: 5px;
-  width: 80px; /* Adjust width as needed */
+  width: 90px; /* Adjust width as needed */
   text-align: center;
-  border-radius: 50px;
+  border-radius: 0px;
   border: 1px solid #ccc;
 }
 
