@@ -17,7 +17,7 @@ html {
 
 .App {
   text-align: center;
-  padding: 20px;
+  padding: 0.1em;
 }
 
 .app-header {
@@ -33,7 +33,7 @@ html {
 }
 
 .input-container {
-  margin: 20px auto;
+  margin: 10px auto;
   display: flex;
   justify-content: center;
   gap: 10px;
@@ -100,7 +100,7 @@ select {
 }
 
 h2, h3 {
-  margin: 2px 0;
+  margin: 0.3em 0;
 }
 
 .metadata-container {
@@ -121,7 +121,7 @@ h2, h3 {
 
 .table-header {
   background-color: rgb(200, 200, 200);
-  padding: 5px;
+  padding: 0.2em;
   cursor: pointer;
   display: flex;
   justify-content: space-between;
@@ -227,9 +227,9 @@ input:checked + .slider:before {
 
 .metadata-title {
   text-align: left; /* Align text to the left */
-  margin: 10px auto 5px; /* Top, Center horizontally, Bottom margin */
+  margin: 1px auto 1px; /* Top, Center horizontally, Bottom margin */
   width: 90%; /* Same width as the table container */
-  font-size: 18px;
+  font-size: 1.2em;
   font-weight: bold;
   color: whitesmoke;
 }
