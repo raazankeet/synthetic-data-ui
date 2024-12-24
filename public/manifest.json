@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "Synthetic Data Generator",
+  "name": "Tool to generate synthetic data for RDBMS.",
   "icons": [
     {
       "src": "favicon.ico",

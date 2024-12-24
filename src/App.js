@@ -186,7 +186,8 @@ function App() {
                         <option value="city">City</option>
                         <option value="state">State</option>
                         <option value="zipcode">Zip Code</option>
-                        <option value="streetAddress">Street Address</option>
+                        <option value="addressline1">Address Line 1</option>
+                        <option value="addressline2">Address Line 2</option>
                         <option value="fullAddress">Full Address</option>
                         <option value="ssn">SSN</option>
                         <option value="emailID">Email</option>
@@ -195,6 +196,7 @@ function App() {
                         <option value="weather">Weather</option>
                         <option value="temperature">Temperature</option>
                         <option value="creditCardNumber">Credit Card Number</option>
+                        <option value="dollarAmount">Dollar Amount</option>
                         <option value="randomNumber">Random Number</option>
                         <option value="artistName">Artist Name</option>
 						            <option value="regex">Regular Expression (Regex)</option>
@@ -319,12 +321,16 @@ function App() {
           generate_data: generateDataState[tableName] || false,
           truncate_table: truncateTableState[tableName] || false,
           existing_record_count: table.total_rows || 0,
-          records_to_generate: recordCounts[tableName] || 10,
+          records_to_generate: Number(recordCounts[tableName]) || 10,
           columns: table.columns.map((column) => ({
             COLUMN_NAME: column.COLUMN_NAME,
             DATA_TYPE: column.DATA_TYPE,
             CHARACTER_MAXIMUM_LENGTH: column.CHARACTER_MAXIMUM_LENGTH,
+            PRIMARY_KEY: column.PRIMARY_KEY,
+            NULLABLE: column.NULLABLE,
             selected_generator: selectedGenerators[tableName]?.[column.COLUMN_NAME] || "",
+
+            
           })),
         };
         output[tableType][tableName] = tableData;
@@ -349,6 +355,34 @@ function App() {
     return JSON.stringify(output, null, 2);
   };
 
+  const generateSyntheticData = async () => {
+    try {
+      const jsonOutput = generateJsonOutput(); // Call the function that generates your JSON output
+
+      // alert('The Json Data is'+JSON.stringify(jsonOutput, null, 2));
+      const response = await fetch('http://127.0.0.1:5001/submit', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+
+        body: jsonOutput,
+      });
+  
+      if (!response.ok) {
+        throw new Error('Failed to post JSON data');
+      }
+  
+      // Handle the response
+      const data = await response.json();
+      console.log('Post successful', data);
+      // alert('JSON data successfully posted!');
+    } catch (error) {
+      console.error('Error posting JSON:', error);
+      alert('Error posting JSON data');
+    }
+  };
+
   return (
     <div className="App">
       <h1>Synthetic Data Generator</h1>
@@ -361,6 +395,7 @@ function App() {
         />
         <button onClick={handleFetchMetadata}>Fetch Metadata</button>
         <button onClick={generateJsonOutput}>Generate JSON</button>
+        <button onClick={generateSyntheticData}>Generate Synthetic Data</button>
       </div>
       {metadata && (
         <div>
@@ -403,5 +438,8 @@ function App() {
 const capitalizeFirstLetter = (string) => {
   return string.charAt(0).toUpperCase() + string.slice(1);
 };
+
+
+
 
 export default App;
