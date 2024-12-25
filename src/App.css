@@ -121,11 +121,12 @@ h2, h3 {
 
 .table-header {
   background-color: rgb(200, 200, 200);
-  padding: 0.2em;
+  padding: 0.5rem;
   cursor: pointer;
   display: flex;
+  height: 3.1rem;
   justify-content: space-between;
-  border-bottom: 1px solid rgb(220, 220, 220);
+  border-bottom: 2px solid rgb(220, 220, 220);
 }
 
 .collapse-button {
@@ -355,6 +356,8 @@ input:checked + .slider:before {
 .current-rows-label {
   font-weight: bold;
   color: #555; /* Slightly darker text color */
+  font-size: 16px;
+
 }
 
 .current-rows-badge {
@@ -363,9 +366,9 @@ input:checked + .slider:before {
   font-weight: bold;
   padding: 5px 10px;
   border-radius: 15px;
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   display: inline-block;
-  min-width: 50px;
+  min-width: 5px;
   text-align: center;
   box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
 }
@@ -406,7 +409,7 @@ input:checked + .slider:before {
 .truncate-checkbox:checked::after {
   content: "✓";
   color: white;
-  font-size: 18px; /* Increased font size for the tick */
+  font-size: 16px; /* Increased font size for the tick */
   position: absolute;
   top: 50%; /* Vertically center */
   left: 50%; /* Horizontally center */
@@ -444,5 +447,32 @@ input:checked + .slider:before {
   background-color: #f44336;
   color: #fff;
 }
+
+
+.reusability-text-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 4em;
+
+}
+
+
+.reusability-text-container span {
+  font-size: 14px;
+  color: #555;
+  font-weight: bold;
+
+
+}
+
+.reusability-slider-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding-top: 10px;
+
+}
+
 
 

@@ -1,9 +1,17 @@
 import React, { useState } from "react";
 import { FaCircleChevronUp ,FaCircleChevronDown } from "react-icons/fa6";
 import { TfiKey } from "react-icons/tfi";
+import Slider from '@mui/material/Slider';
 import { MaterialReactTable } from 'material-react-table';
+import "react-bootstrap-range-slider/dist/react-bootstrap-range-slider.css";
+
+
+
+
+
 
 import "./App.css";
+
 
 function App() {
   const [tableName, setTableName] = useState("");
@@ -13,8 +21,11 @@ function App() {
   const [generateDataState, setGenerateDataState] = useState({});
   const [recordCounts, setRecordCounts] = useState({});
   const [truncateTableState, setTruncateTableState] = useState({}); // New state for truncate table
- 
+  const [reusabilityPct, setReusabilityPct] = useState({}); // State for reusability percentage
 
+  
+
+  
   // Fetch metadata from API
   const handleFetchMetadata = () => {
     if (tableName.trim() === "") {
@@ -234,7 +245,33 @@ function App() {
                 onChange={(e) => handleRecordCountChange(tableName, e.target.value)}
                 disabled={!isGenerateDataEnabled}
               />
+              
             </div>
+            <div className="reusability-text-container">
+            <span>New  Keys Reuse % </span>
+            </div>
+
+            <div className="reusability-slider-container">
+            <Slider
+  defaultValue={30}
+  valueLabelDisplay="auto"
+  aria-label="Percentage Reusage"
+  size="small"
+  
+  disabled={!isGenerateDataEnabled}
+  onChange={(e) =>
+    setReusabilityPct({ ...reusabilityPct, [tableName]: Number(e.target.value) })
+  }
+  sx={{
+    width: 70,
+    color: 'secondary',
+    '& .MuiSlider-thumb': {
+      borderRadius: '3px',
+    },
+  }}
+/>
+</div>          
+          
             <div className="truncate-table-container">
               <label>
                 <input
@@ -322,6 +359,7 @@ function App() {
           truncate_table: truncateTableState[tableName] || false,
           existing_record_count: table.total_rows || 0,
           records_to_generate: Number(recordCounts[tableName]) || 10,
+          reusability_pct:reusabilityPct[tableName] ,
           columns: table.columns.map((column) => ({
             COLUMN_NAME: column.COLUMN_NAME,
             DATA_TYPE: column.DATA_TYPE,
