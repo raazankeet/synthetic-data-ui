@@ -57,13 +57,10 @@ button {
   cursor: pointer;
 }
 
-button:hover {
-  background-color: #005bb5;
-}
 
 .table-container {
   margin: 10px auto;
-  width: 90%;
+  width: 95%;
   background-color: white;
   box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
   border-radius: var(--border-radius); /* Use the border-radius variable */
@@ -100,7 +97,7 @@ select {
 }
 
 h2, h3 {
-  margin: 0.3em 0;
+  margin: 0.3em;
 }
 
 .metadata-container {
@@ -119,16 +116,6 @@ h2, h3 {
   transition: max-height 0.3s ease-in;
 }
 
-.table-header {
-  background-color: rgb(200, 200, 200);
-  padding: 0.5rem;
-  cursor: pointer;
-  display: flex;
-  height: 3.1rem;
-  justify-content: space-between;
-  border-bottom: 2px solid rgb(220, 220, 220);
-}
-
 .collapse-button {
   background: none;
   border: none;
@@ -144,32 +131,14 @@ h2, h3 {
   color: #000306; /* Change color on hover for better feedback */
 }
 
-.toggle-update-button {
-  padding: 5px 5px;
-  border: none;
-  border-radius: var(--border-radius); /* Use the border-radius variable */
-  color: white;
-  cursor: pointer;
-  font-size: 12px;
-  transition: background-color 0.3s ease, transform 0.2s ease;
-}
-
-.toggle-update-button.enabled {
-  background-color: green;
-}
-
-.toggle-update-button.disabled {
-  background-color: red;
-}
-
-.toggle-update-button:hover {
-  transform: scale(1.0);
-}
 
 .header-controls {
   display: flex;
-  gap: 10px;
+  gap: 10px; /* Space between elements */
   align-items: center;
+  margin-left: 20px; /* Ensure a fixed space between badge and controls */
+  justify-content: flex-start; /* Align items to the start */
+  flex-wrap: wrap; /* Allow wrapping for small screens */
 }
 
 /* Style for the toggle switch */
@@ -186,84 +155,27 @@ h2, h3 {
   height: 0;
 }
 
-.slider {
-  position: absolute;
-  cursor: pointer;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: #f44336; /* Red background for disabled state */
-  transition: 0.4s;
-  border-radius: 34px;
-}
-
-.slider:before {
-  position: absolute;
-  content: "";
-  height: 16px; /* Slimmed down the height */
-  width: 16px; /* Reduced the width of the circle */
-  border-radius: 50%;
-  left: 4px;
-  bottom: 4px;
-  background-color: white;
-  transition: 0.4s;
-}
-
-input:checked + .slider {
-  background-color: #4CAF50; /* Green background for enabled state */
-}
-
-input:checked + .slider:before {
-  transform: translateX(26px); /* Move the circle to the right */
-}
-
-.slider.round {
-  border-radius: 34px;
-}
-
-.slider.round:before {
-  border-radius: 50%;
-}
 
 .metadata-title {
-  text-align: left; /* Align text to the left */
-  margin: 1px auto 1px; /* Top, Center horizontally, Bottom margin */
+  text-align:left; /* Align text to the left */
+  margin: 5px 10px 10px; /* Top, Center horizontally, Bottom margin */
   width: 90%; /* Same width as the table container */
-  font-size: 1.2em;
+  font-size: 1.5em;
   font-weight: bold;
   color: whitesmoke;
 }
 
 .metadata-card {
-  background-color: rgb(109, 109, 108);
-  box-shadow: 5px 10px 10px rgba(0, 0, 0, 0.3);
+  background-color: rgb(94, 92, 90);
+  box-shadow: 8px 5px 10px rgba(0, 0, 0, 0.3);
   border-radius: var(--border-radius); /* Use the border-radius variable */
-  padding: 5px;
-  margin-bottom: 25px;
-  margin: 20px auto;
+  padding: 2px;
+  margin: 30px auto;
   width: 90%;
   overflow: hidden;
 }
 
-.records-count-container {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-}
 
-.records-count-container input {
-  padding: 5px;
-  width: 90px; /* Adjust width as needed */
-  text-align: center;
-  border-radius: 0px;
-  border: 1px solid #ccc;
-}
-
-/* Ensure the input doesn't get too wide */
-.records-count-container input:disabled {
-  background-color: #f0f0f0; /* Grey out the input when disabled */
-}
 
 /* Modify header-controls to ensure proper alignment */
 .header-controls {
@@ -278,6 +190,8 @@ input:checked + .slider:before {
   display: flex;
   align-items: center;
   gap: 10px;
+  margin-left: 30px; /* Fixed margin to ensure the section starts at a constant position */
+  position: relative; /* To position it independently of other sections */
 }
 
 .records-count-container input {
@@ -293,131 +207,32 @@ input:checked + .slider:before {
   background-color: #f0f0f0; /* Grey out the input when disabled */
 }
 
-/* Style for the toggle switch */
-.switch {
-  position: relative;
-  display: inline-block;
-  width: 50px;
-  height: 24px; /* Slimmed down the height */
-}
-
-.switch input {
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
-
-.slider {
-  position: absolute;
-  cursor: pointer;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: #f44336; /* Red background for disabled state */
-  transition: 0.4s;
-  border-radius: 34px;
-}
-
-.slider:before {
-  position: absolute;
-  content: "";
-  height: 16px; /* Slimmed down the height */
-  width: 16px; /* Reduced the width of the circle */
-  border-radius: 50%;
-  left: 4px;
-  bottom: 4px;
-  background-color: white;
-  transition: 0.3s;
-}
-
-input:checked + .slider {
-  background-color: #4CAF50; /* Green background for enabled state */
-}
-
-input:checked + .slider:before {
-  transform: translateX(26px); /* Move the circle to the right */
-}
-
-.slider.round {
-  border-radius: 34px;
-}
-
-.slider.round:before {
-  border-radius: 50%;
-}
-
-.total-rows-container {
+/* Fix the position of the reusability section */
+.reusability-text-container {
   display: flex;
-  align-items: center;
-  gap: 10px; /* Add space between label and badge */
+  flex-direction: column;
+  align-items: flex-start;
+  width: 4em;
+  margin-left: 20px; /* Ensure a fixed margin from the previous section */
 }
 
-.current-rows-label {
-  font-weight: bold;
-  color: #555; /* Slightly darker text color */
-  font-size: 16px;
-
-}
-
-.current-rows-badge {
-  background-color: #007bff; /* Bootstrap primary color for contrast */
-  color: white;
-  font-weight: bold;
-  padding: 5px 10px;
-  border-radius: 15px;
-  font-size: 0.8rem;
-  display: inline-block;
-  min-width: 5px;
-  text-align: center;
-  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
-}
-
-/* Styling for the truncate checkbox container */
-.truncate-container {
+.reusability-slider-container {
   display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 10px;
+  margin-left: 20px; /* Ensure consistent spacing */
+}
+
+
+
+.badge {
+  display: inline-flex;
   align-items: center;
-  margin-top: 10px;
+  padding: 3px 5px;
+  border-radius: 12px;
+  font-size: 18px;
 }
-
-/* Flat style checkbox */
-.truncate-checkbox {
-  appearance: none;
-  width: 1.5em;
-  height: 1.5em;
-  border: 2px solid #ccc;
-  background-color: white;
-  cursor: pointer;
-  position: relative;
-  margin-right: 0.25em;
-  vertical-align: middle;
-  transition: border-color 0.2s ease, background-color 0.2s ease;
-}
-
-/* Border color change on hover */
-.truncate-checkbox:hover {
-  border-color: #ff6b6b;
-}
-
-/* Border color change when checked */
-.truncate-checkbox:checked {
-  background-color: #ff6b6b;
-  border-color: #ff6b6b;
-}
-
-/* Add checkmark */
-.truncate-checkbox:checked::after {
-  content: "✓";
-  color: white;
-  font-size: 16px; /* Increased font size for the tick */
-  position: absolute;
-  top: 50%; /* Vertically center */
-  left: 50%; /* Horizontally center */
-  transform: translate(-50%, -50%); /* Adjust to exactly center */
-}
-
-
-
 
 .badges-container {
   position: absolute;  /* Position badges relative to the td */
@@ -433,7 +248,7 @@ input:checked + .slider:before {
 .badge {
   display: inline-flex;
   align-items: center;
-  padding:3px 5px;
+  padding: 3px 5px;
   border-radius: 12px;
   font-size: 12px;
 }
@@ -448,31 +263,52 @@ input:checked + .slider:before {
   color: #fff;
 }
 
-
 .reusability-text-container {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   width: 4em;
-
 }
-
 
 .reusability-text-container span {
   font-size: 14px;
   color: #555;
   font-weight: bold;
-
-
 }
 
 .reusability-slider-container {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  padding-top: 10px;
-
+  padding: 15px;
 }
 
 
+
+.table-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* Align items to the left */
+  padding-top: 10px;
+  background-color: rgb(232, 232, 232);
+ 
+}
+
+.table-header h2 {
+   /* Remove default margin to bring h2 and badge closer */
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #333;
+
+}
+
+.record-count-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+   /* Space between h2 and badge */
+  position: relative; /* Enable positioning */
+  bottom: 20px; /* Adjust this value to move the badge vertically */
+  padding-left: 0.9em; /* Adds slight left padding to prevent squeezing */
+}
 

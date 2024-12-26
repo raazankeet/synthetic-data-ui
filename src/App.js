@@ -1,16 +1,28 @@
 import React, { useState } from "react";
 import { FaCircleChevronUp ,FaCircleChevronDown } from "react-icons/fa6";
 import { TfiKey } from "react-icons/tfi";
-import Slider from '@mui/material/Slider';
+
+
+
+
 import { MaterialReactTable } from 'material-react-table';
 import "react-bootstrap-range-slider/dist/react-bootstrap-range-slider.css";
+import Switch from '@mui/material/Switch';
+
+import { Badge } from '@mui/material';
+import Checkbox from '@mui/material/Checkbox';
+import Slider from '@mui/material/Slider';
+
+import { grey,red } from '@mui/material/colors';
 
 
 
-
+import DeleteIcon from '@mui/icons-material/Delete'; // Icon for checked state
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'; // Icon for unchecked state
 
 
 import "./App.css";
+
 
 
 function App() {
@@ -24,7 +36,7 @@ function App() {
   const [reusabilityPct, setReusabilityPct] = useState({}); // State for reusability percentage
 
   
-
+ 
   
   // Fetch metadata from API
   const handleFetchMetadata = () => {
@@ -231,12 +243,18 @@ function App() {
     return (
       <div key={tableName} className="table-container">
         <div className="table-header">
-          <h2>{capitalizeFirstLetter(tableName)}</h2>
+          <h2>{capitalizeFirstLetter(tableName)}
+          <div className="record-count-badge">
+          <Badge
+        badgeContent={tableData.total_rows || 0}  // Number to display inside the badge
+        color="secondary"   // Badge color, can be "default", "primary", "secondary", etc.
+        overlap="circular" // Badge will be circular (default behavior)
+        max={1000000}
+        showZero={true}
+      ></Badge>
+      </div>
+      </h2>
           <div className="header-controls">
-            <div className="total-rows-container">
-              <span className="current-rows-label">Current Rows:</span>
-              <div className="current-rows-badge">{tableData.total_rows || 0}</div>
-            </div>
             <div className="records-count-container">
               <span>Records to Generate:</span>
               <input
@@ -258,7 +276,7 @@ function App() {
   aria-label="Percentage Reusage"
   size="small"
   
-  disabled={!isGenerateDataEnabled}
+  disabled={tableData.isCentralTable || !isGenerateDataEnabled}
   onChange={(e) =>
     setReusabilityPct({ ...reusabilityPct, [tableName]: Number(e.target.value) })
   }
@@ -274,24 +292,50 @@ function App() {
           
             <div className="truncate-table-container">
               <label>
-                <input
-                  type="checkbox"
-                  className="truncate-checkbox"
-                  checked={truncateTableState[tableName] || false}
-                  onChange={() => handleTruncateTableToggle(tableName)}
-                />
+                
                 Truncate Load
               </label>
             </div>
+
+            <Checkbox
+      
+      checked={truncateTableState[tableName] || false}
+      onChange={() => handleTruncateTableToggle(tableName)}
+      icon={<DeleteOutlineIcon />} // Icon for unchecked state
+      checkedIcon={<DeleteIcon />} // Icon for checked state
+        sx={{
+          color: grey[600],
+          '&.Mui-checked': {
+            color: red[800],
+          },
+        }}
+      />
+
+
+
+
             <span className="generate-data-text">Generate Data</span>
-            <label className="switch">
-              <input
-                type="checkbox"
-                checked={isGenerateDataEnabled || false}
-                onChange={() => handleGenerateDataToggle(tableName)}
-              />
-              <span className="slider round"></span>
-            </label>
+            <Switch
+      checked={isGenerateDataEnabled || false}
+      onChange={() => handleGenerateDataToggle(tableName)}
+      color="default"
+      
+      sx={{
+        
+        '& .MuiSwitch-track': {
+          backgroundColor: isGenerateDataEnabled ? 'green' : 'red', // Track color based on state
+          borderRadius: 20, // Rounded corners for the track
+          opacity: 0.51, // Slight opacity for the track when unchecked
+          transition: 'background-color 0.2s ease', // Smooth transition for color change
+        },
+        '& .MuiSwitch-thumb': {
+          backgroundColor: isGenerateDataEnabled ? 'green' : 'red',  // Optional: make the thumb color consistent
+          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)', // Larger shadow on hover
+        }
+      }}
+    />
+
+            
             <button className="collapse-button" onClick={() => toggleTable(tableName)}>
               {expandedTables[tableName] ? (
                 <FaCircleChevronUp size={20} />
@@ -442,7 +486,7 @@ function App() {
               <div className="metadata-card">
                 <h3 className="metadata-title">Central Table</h3>
                 {metadata.central_table_metadata.map((table) =>
-                  renderTable(table.table_name, table)
+                 renderTable(table.table_name, { ...table, isCentralTable: true })
                 )}
               </div>
             </div>
