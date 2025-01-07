@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { FaCircleChevronUp ,FaCircleChevronDown } from "react-icons/fa6";
 import { TfiKey } from "react-icons/tfi";
 
-
+import FinalResponse from "./components/FinalResponse";
 
 
 import { MaterialReactTable } from 'material-react-table';
@@ -35,9 +35,13 @@ function App() {
   const [truncateTableState, setTruncateTableState] = useState({}); // New state for truncate table
   const [reusabilityPct, setReusabilityPct] = useState({}); // State for reusability percentage
 
-  
+  const [showModal, setShowModal] = useState(false);
+  const [apiResponse, setApiResponse] = useState(null);
  
-  
+  const closeModal = () => {
+    setShowModal(false);
+  };
+
   // Fetch metadata from API
   const handleFetchMetadata = () => {
     if (tableName.trim() === "") {
@@ -205,6 +209,7 @@ function App() {
                         <option value="firstName">First Name</option>
                         <option value="lastName">Last Name</option>
                         <option value="fullName">Full Name</option>
+                        <option value="gender">Gender</option>
                         <option value="phoneNumber">Phone Number</option>
                         <option value="city">City</option>
                         <option value="state">State</option>
@@ -230,11 +235,13 @@ function App() {
                         <option value="productName">Product Name</option>
                         <option value="catchPhrase">Catchphrase</option>
                         <option value="hospitalName">Hospital Name</option>
+                        <option value="hospitalType">Hospital Type</option>
                         <option value="diseaseName">Disease Name</option>
                         <option value="medicineName">Medicine Name</option>
                         <option value="sha256">SHA 256</option>
                         <option value="futureDate">Future Date</option>
                         <option value="pastDate">Past Date</option>
+                        <option value="boolean">Boolean (1/0)</option>
           </select>
         ),
       },
@@ -242,18 +249,23 @@ function App() {
   
     return (
       <div key={tableName} className="table-container">
-        <div className="table-header">
-          <h2>{capitalizeFirstLetter(tableName)}
-          <div className="record-count-badge">
+        <div className="table-header"> 
+              <h2>
+        {capitalizeFirstLetter(tableName)}
+        <span style={{ marginRight: '2px' }}></span>  {/* Add space here */}
+        <div className="record-count-badge">
           <Badge
-        badgeContent={tableData.total_rows || 0}  // Number to display inside the badge
-        color="secondary"   // Badge color, can be "default", "primary", "secondary", etc.
-        overlap="circular" // Badge will be circular (default behavior)
-        max={1000000}
-        showZero={true}
-      ></Badge>
-      </div>
+            badgeContent={tableData.total_rows || 0}  // Number to display inside the badge
+            color="secondary"   // Badge color, can be "default", "primary", "secondary", etc.
+            overlap="circular"  // Badge will be circular (default behavior)
+            max={1000000}
+            showZero={true}
+            
+            style={{ width: '12px', height: '12px', minWidth: '22px', minHeight: '12px' }}
+          />
+        </div>
       </h2>
+
           <div className="header-controls">
             <div className="records-count-container">
               <span>Records to Generate:</span>
@@ -410,6 +422,7 @@ function App() {
             CHARACTER_MAXIMUM_LENGTH: column.CHARACTER_MAXIMUM_LENGTH,
             PRIMARY_KEY: column.PRIMARY_KEY,
             NULLABLE: column.NULLABLE,
+            IDENTITY: column.IDENTITY,
             selected_generator: selectedGenerators[tableName]?.[column.COLUMN_NAME] || "",
 
             
@@ -437,6 +450,7 @@ function App() {
     return JSON.stringify(output, null, 2);
   };
 
+
   const generateSyntheticData = async () => {
     try {
       const jsonOutput = generateJsonOutput(); // Call the function that generates your JSON output
@@ -458,7 +472,10 @@ function App() {
       // Handle the response
       const data = await response.json();
       console.log('Post successful', data);
-      // alert('JSON data successfully posted!');
+ 
+      setApiResponse(data);
+      setShowModal(true);  // Show modal with the response data
+
     } catch (error) {
       console.error('Error posting JSON:', error);
       alert('Error posting JSON data');
@@ -513,7 +530,9 @@ function App() {
           )}
         </div>
       )}
+     {showModal && <FinalResponse message="Data generation successful!" data={apiResponse} closeModal={closeModal} />}
     </div>
+    
   );
 }
 

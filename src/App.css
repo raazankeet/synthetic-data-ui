@@ -158,7 +158,7 @@ h2, h3 {
 
 .metadata-title {
   text-align:left; /* Align text to the left */
-  margin: 5px 10px 10px; /* Top, Center horizontally, Bottom margin */
+  margin: 5px 40px 5px; /* Top, Center horizontally, Bottom margin */
   width: 90%; /* Same width as the table container */
   font-size: 1.5em;
   font-weight: bold;
@@ -196,7 +196,7 @@ h2, h3 {
 
 .records-count-container input {
   padding: 5px;
-  width: 55px; /* Adjust width as needed */
+  width: 80px; /* Adjust width as needed */
   text-align: center;
   border-radius: var(--border-radius);
   border: 1px solid #ccc;
@@ -306,9 +306,10 @@ h2, h3 {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-   /* Space between h2 and badge */
   position: relative; /* Enable positioning */
-  bottom: 20px; /* Adjust this value to move the badge vertically */
-  padding-left: 0.9em; /* Adds slight left padding to prevent squeezing */
+  bottom: 15px; /* Adjust this value to move the badge vertically */
+  margin-left: 0px; /* Adds space between the h2 and the badge */
+  min-width: 10px; /* Ensure a minimum size */
+  min-height: 20px; /* Ensure a minimum height */
 }
 
