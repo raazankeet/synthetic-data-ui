@@ -3,6 +3,11 @@ import { FaCircleChevronUp ,FaCircleChevronDown } from "react-icons/fa6";
 import { TfiKey } from "react-icons/tfi";
 
 import FinalResponse from "./components/FinalResponse";
+import ConfirmationDialog from "./components/ConfirmationDialog";
+
+import LoadingButton from '@mui/lab/LoadingButton';
+
+import { TbDatabaseSearch } from "react-icons/tb";
 
 
 import { MaterialReactTable } from 'material-react-table';
@@ -37,6 +42,31 @@ function App() {
 
   const [showModal, setShowModal] = useState(false);
   const [apiResponse, setApiResponse] = useState(null);
+
+
+  const [loadingFetch, setLoadingFetch] = useState(false);
+
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [currentAction, setCurrentAction] = useState(null); // Stores the function to execute
+
+  const handleOpenDialog = (action) => {
+    setCurrentAction(() => action); // Set the function to execute
+    setDialogOpen(true); // Open the confirmation dialog
+  };
+
+  const handleCloseDialog = () => {
+    setDialogOpen(false); // Close the dialog
+    setCurrentAction(null); // Clear the action
+  };
+
+  const handleConfirm = () => {
+    if (currentAction) {
+      currentAction(); // Execute the function
+    }
+    setDialogOpen(false); // Close the dialog
+  };
+
+
  
   const closeModal = () => {
     setShowModal(false);
@@ -44,15 +74,20 @@ function App() {
 
   // Fetch metadata from API
   const handleFetchMetadata = () => {
+    setLoadingFetch(true);
     if (tableName.trim() === "") {
       alert("Please enter a table name!");
+      setLoadingFetch(false);
       return;
     }
 
     fetch(`http://127.0.0.1:5000/get_metadata?table_name=${tableName}`)
+    
       .then((response) => response.json())
       .then((data) => {
         setMetadata(data);
+        
+        setLoadingFetch(false);
 
         setExpandedTables({
           central: true,
@@ -115,7 +150,9 @@ function App() {
           }, {}),
         });
       })
+      
       .catch((error) => console.error("Error fetching metadata:", error));
+      
   };
 
   const toggleTable = (tableName) => {
@@ -492,7 +529,7 @@ function App() {
           onChange={(e) => setTableName(e.target.value)}
           placeholder="Enter table name"
         />
-        <button onClick={handleFetchMetadata}>Fetch Metadata</button>
+        <LoadingButton color="secondary"  endIcon={<TbDatabaseSearch />} loadingPosition="end" loading={loadingFetch} variant="contained" onClick={handleFetchMetadata}>Fetch Metadata </LoadingButton>
         <button onClick={generateJsonOutput}>Generate JSON</button>
         <button onClick={generateSyntheticData}>Generate Synthetic Data</button>
       </div>
