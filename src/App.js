@@ -4,11 +4,13 @@ import { TfiKey } from "react-icons/tfi";
 
 import FinalResponse from "./components/FinalResponse";
 import ConfirmationDialog from "./components/ConfirmationDialog";
+import CustomAppBar from "./components/CustomAppBar";
 
 import LoadingButton from '@mui/lab/LoadingButton';
 
 import { TbDatabaseSearch } from "react-icons/tb";
-
+import { GrSettingsOption } from "react-icons/gr";
+import { MdOutlineHelpCenter  } from "react-icons/md";
 
 import { MaterialReactTable } from 'material-react-table';
 import "react-bootstrap-range-slider/dist/react-bootstrap-range-slider.css";
@@ -66,7 +68,13 @@ function App() {
     setDialogOpen(false); // Close the dialog
   };
 
+  const handleMenuClick = () => {
+    console.log('Menu icon clicked!');
+  };
 
+  const handleButtonClick = (buttonName) => {
+    console.log(`${buttonName} button clicked!`);
+  };
  
   const closeModal = () => {
     setShowModal(false);
@@ -520,8 +528,31 @@ function App() {
   };
 
   return (
+
+    
     <div className="App">
-      <h1>Synthetic Data Generator</h1>
+
+<div>
+      <CustomAppBar
+        title="Synthetic Data Generator"
+        onMenuClick={handleMenuClick}
+        actionButtons={[
+          
+          { icon: <GrSettingsOption size={22} />, onClick: () => handleButtonClick("Settings"), tooltip: "Settings" },
+          { icon: <MdOutlineHelpCenter   size={28} />, onClick: () => handleButtonClick("Help") , tooltip: "Help" },
+          { label: "Login", onClick: () => handleButtonClick("Login"), tooltip: "Login" },
+          
+        ]}
+      />
+      <div style={{ padding: '16px' }}>
+      
+      </div>
+    </div>
+
+
+
+
+      
       <div className="input-container">
         <input
           type="text"
@@ -529,9 +560,20 @@ function App() {
           onChange={(e) => setTableName(e.target.value)}
           placeholder="Enter table name"
         />
-        <LoadingButton color="secondary"  endIcon={<TbDatabaseSearch />} loadingPosition="end" loading={loadingFetch} variant="contained" onClick={handleFetchMetadata}>Fetch Metadata </LoadingButton>
+        <LoadingButton  sx={{ borderRadius: '15px' }} size="large"  color="secondary"  endIcon={<TbDatabaseSearch />} loadingPosition="end" loading={loadingFetch} variant="contained" onClick={() => handleOpenDialog(handleFetchMetadata)}>Scan Metadata </LoadingButton>
         <button onClick={generateJsonOutput}>Generate JSON</button>
         <button onClick={generateSyntheticData}>Generate Synthetic Data</button>
+        <ConfirmationDialog
+        open={dialogOpen}
+        onClose={handleCloseDialog}
+        onConfirm={handleConfirm}
+        title="Scan Metadata?"
+        message="Are you sure you want to scan the database to fetch metadata? This action may take a few moments."
+        confirmText="Scan"
+        cancelText="Cancel"
+      />
+
+
       </div>
       {metadata && (
         <div>
