@@ -1,84 +1,73 @@
+// React imports
 import React, { useState } from "react";
-import { FaCircleChevronUp ,FaCircleChevronDown } from "react-icons/fa6";
+
+// External libraries and icons
+import { FaCircleChevronUp, FaCircleChevronDown } from "react-icons/fa6";
 import { TfiKey } from "react-icons/tfi";
+import { TbDatabaseSearch, TbDatabaseImport } from "react-icons/tb";
+import { GrSettingsOption } from "react-icons/gr";
+import { MdOutlineHelpCenter } from "react-icons/md";
 
+// Material UI imports
+import { MaterialReactTable } from "material-react-table";
+import Switch from "@mui/material/Switch";
+import Badge from '@mui/material/Badge';
+import Checkbox from "@mui/material/Checkbox";
+import Slider from "@mui/material/Slider";
+import { grey, red } from "@mui/material/colors";
+import DeleteIcon from "@mui/icons-material/Delete"; // Icon for checked state
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline"; // Icon for unchecked state
+import LoadingButton from "@mui/lab/LoadingButton";
 
+// Custom Components
 import FinalResponse from "./components/FinalResponse";
 import ConfirmationDialog from "./components/ConfirmationDialog";
 import CustomAppBar from "./components/CustomAppBar";
 import SnackbarComponent from "./components/SnackbarComponent";
-
-import LoadingButton from '@mui/lab/LoadingButton';
-
-import { TbDatabaseSearch,TbDatabaseImport } from "react-icons/tb";
-import { GrSettingsOption } from "react-icons/gr";
-import { MdOutlineHelpCenter  } from "react-icons/md";
-
-import { MaterialReactTable } from 'material-react-table';
-import "react-bootstrap-range-slider/dist/react-bootstrap-range-slider.css";
-import Switch from '@mui/material/Switch';
-
-import { Badge } from '@mui/material';
-import Checkbox from '@mui/material/Checkbox';
-import Slider from '@mui/material/Slider';
-
-import { grey,red } from '@mui/material/colors';
-
-
-
-import DeleteIcon from '@mui/icons-material/Delete'; // Icon for checked state
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'; // Icon for unchecked state
-
 import MyTextField from "./components/MyTextField";
+
 
 import "./App.css";
 
-
-
-
 function App() {
-  const [tableName, setTableName] = useState("");
-  const [metadata, setMetadata] = useState(null);
-  const [selectedGenerators, setSelectedGenerators] = useState({});
-  const [expandedTables, setExpandedTables] = useState({});
-  const [generateDataState, setGenerateDataState] = useState({});
-  const [recordCounts, setRecordCounts] = useState({});
-  const [truncateTableState, setTruncateTableState] = useState({}); // New state for truncate table
-  const [reusabilityPct, setReusabilityPct] = useState({}); // State for reusability percentage
 
-  const [showModal, setShowModal] = useState(false);
-  const [apiResponse, setApiResponse] = useState(null);
+const [showModal, setShowModal] = useState(false);
+const [dialogOpen, setDialogOpen] = useState(false);
+const [currentAction, setCurrentAction] = useState(null);
+const [dialogTitle, setDialogTitle] = useState("");
+const [dialogMessage, setDialogMessage] = useState("");
+
+const [snackbarOpen, setSnackbarOpen] = useState(false);
+const [snackbarMessage, setSnackbarMessage] = useState("");
+const [snackbarSeverity, setSnackbarSeverity] = useState("info");
+const [snackbarTransition, setSnackbarTransition] = useState(undefined);
+
+const [tableName, setTableName] = useState("");
+const [metadata, setMetadata] = useState(null);
+const [selectedGenerators, setSelectedGenerators] = useState({});
+const [expandedTables, setExpandedTables] = useState({});
+const [generateDataState, setGenerateDataState] = useState({});
+const [recordCounts, setRecordCounts] = useState({});
+const [truncateTableState, setTruncateTableState] = useState({});
+const [reusabilityPct, setReusabilityPct] = useState({});
+
+const [loadingFetch, setLoadingFetch] = useState(false);
+const [loadingGenerateSyntheticData, setloadingGenerateSyntheticData] = useState(false);
+const [apiResponse, setApiResponse] = useState(null);
+
+const [isNightMode, setIsNightMode] = useState(false);
 
 
-  const [loadingFetch, setLoadingFetch] = useState(false);
-  const [loadingGenerateSyntheticData, setloadingGenerateSyntheticData] = useState(false);
-
-
-
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [currentAction, setCurrentAction] = useState(null);
-  const [dialogTitle, setDialogTitle] = useState("");
-  const [dialogMessage, setDialogMessage] = useState("");
-
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState("");
-  const [snackbarSeverity, setSnackbarSeverity] = useState("info");
-  const [snackbarTransition, setSnackbarTransition] = useState(undefined);
-
-  const [isNightMode, setIsNightMode] = useState(false);
-
-    // Toggle day/night mode
-    const toggleNightMode = () => {
-      setIsNightMode(prevMode => !prevMode);
-    };
+  // Toggle day/night mode
+  const toggleNightMode = () => {
+    setIsNightMode((prevMode) => !prevMode);
+  };
 
   const handleSnackbarClose = (event, reason) => {
     if (reason === "clickaway") return;
     setSnackbarOpen(false);
   };
 
-
-  
   const showSnackbar = (message, severity, transition = undefined) => {
     setSnackbarMessage(message);
     setSnackbarSeverity(severity);
@@ -106,13 +95,13 @@ function App() {
   };
 
   const handleMenuClick = () => {
-    console.log('Menu icon clicked!');
+    console.log("Menu icon clicked!");
   };
 
   const handleButtonClick = (buttonName) => {
     console.log(`${buttonName} button clicked!`);
   };
- 
+
   const closeModal = () => {
     setShowModal(false);
   };
@@ -127,11 +116,10 @@ function App() {
     }
 
     fetch(`http://127.0.0.1:5000/get_metadata?table_name=${tableName}`)
-    
       .then((response) => response.json())
       .then((data) => {
         setMetadata(data);
-        
+
         setLoadingFetch(false);
 
         setExpandedTables({
@@ -195,9 +183,8 @@ function App() {
           }, {}),
         });
       })
-      
+
       .catch((error) => console.error("Error fetching metadata:", error));
-      
   };
 
   const toggleTable = (tableName) => {
@@ -246,14 +233,14 @@ function App() {
 
   const renderTable = (tableName, tableData) => {
     const isGenerateDataEnabled = generateDataState[tableName];
-  
+
     // Define columns for Material React Table
     const columns = [
       {
-        accessorKey: 'COLUMN_NAME',
-        header: 'Column Name',
+        accessorKey: "COLUMN_NAME",
+        header: "Column Name",
         Cell: ({ cell }) => (
-          <div style={{ position: 'relative' }}>
+          <div style={{ position: "relative" }}>
             {/* Badges container */}
             <div className="badges-container">
               {cell.row.original.PRIMARY_KEY && (
@@ -270,83 +257,94 @@ function App() {
           </div>
         ),
       },
-      { accessorKey: 'DATA_TYPE', header: 'Data Type' },
+      { accessorKey: "DATA_TYPE", header: "Data Type" },
       {
-        accessorKey: 'CHARACTER_MAXIMUM_LENGTH',
-        header: 'Max Length',
-        Cell: ({ cell }) => cell.getValue() || 'N/A',
+        accessorKey: "CHARACTER_MAXIMUM_LENGTH",
+        header: "Max Length",
+        Cell: ({ cell }) => cell.getValue() || "N/A",
       },
       {
-        accessorKey: 'GENERATOR',
-        header: 'Generator',
+        accessorKey: "GENERATOR",
+        header: "Generator",
         Cell: ({ cell }) => (
           <select
             disabled={!isGenerateDataEnabled}
-            value={selectedGenerators[tableName]?.[cell.row.original.COLUMN_NAME] || ''}
+            value={
+              selectedGenerators[tableName]?.[cell.row.original.COLUMN_NAME] ||
+              ""
+            }
             onChange={(e) =>
-              handleGeneratorChange(tableName, cell.row.original.COLUMN_NAME, e.target.value)
+              handleGeneratorChange(
+                tableName,
+                cell.row.original.COLUMN_NAME,
+                e.target.value
+              )
             }
           >
-                        <option value="">Select Generator</option>
-                        <option value="firstName">First Name</option>
-                        <option value="lastName">Last Name</option>
-                        <option value="fullName">Full Name</option>
-                        <option value="gender">Gender</option>
-                        <option value="phoneNumber">Phone Number</option>
-                        <option value="city">City</option>
-                        <option value="state">State</option>
-                        <option value="zipcode">Zip Code</option>
-                        <option value="addressline1">Address Line 1</option>
-                        <option value="addressline2">Address Line 2</option>
-                        <option value="fullAddress">Full Address</option>
-                        <option value="ssn">SSN</option>
-                        <option value="emailID">Email</option>
-                        <option value="bookName">Book Name</option>
-                        <option value="bookAuthor">Book Author</option>
-                        <option value="weather">Weather</option>
-                        <option value="temperature">Temperature</option>
-                        <option value="creditCardNumber">Credit Card Number</option>
-                        <option value="dollarAmount">Dollar Amount</option>
-                        <option value="randomNumber">Random Number</option>
-                        <option value="artistName">Artist Name</option>
-						            <option value="regex">Regular Expression (Regex)</option>
-                        <option value="quotes">Movie Quotes</option>
-                        <option value="sentences">Sentences</option>
-                        <option value="ancientGod">Ancient God</option>
-                        <option value="animalName">Animal Name</option>
-                        <option value="productName">Product Name</option>
-                        <option value="catchPhrase">Catchphrase</option>
-                        <option value="hospitalName">Hospital Name</option>
-                        <option value="hospitalType">Hospital Type</option>
-                        <option value="diseaseName">Disease Name</option>
-                        <option value="medicineName">Medicine Name</option>
-                        <option value="sha256">SHA 256</option>
-                        <option value="futureDate">Future Date</option>
-                        <option value="pastDate">Past Date</option>
-                        <option value="boolean">Boolean (1/0)</option>
+            <option value="">Select Generator</option>
+            <option value="firstName">First Name</option>
+            <option value="lastName">Last Name</option>
+            <option value="fullName">Full Name</option>
+            <option value="gender">Gender</option>
+            <option value="phoneNumber">Phone Number</option>
+            <option value="city">City</option>
+            <option value="state">State</option>
+            <option value="zipcode">Zip Code</option>
+            <option value="addressline1">Address Line 1</option>
+            <option value="addressline2">Address Line 2</option>
+            <option value="fullAddress">Full Address</option>
+            <option value="ssn">SSN</option>
+            <option value="emailID">Email</option>
+            <option value="bookName">Book Name</option>
+            <option value="bookAuthor">Book Author</option>
+            <option value="weather">Weather</option>
+            <option value="temperature">Temperature</option>
+            <option value="creditCardNumber">Credit Card Number</option>
+            <option value="dollarAmount">Dollar Amount</option>
+            <option value="randomNumber">Random Number</option>
+            <option value="artistName">Artist Name</option>
+            <option value="regex">Regular Expression (Regex)</option>
+            <option value="quotes">Movie Quotes</option>
+            <option value="sentences">Sentences</option>
+            <option value="ancientGod">Ancient God</option>
+            <option value="animalName">Animal Name</option>
+            <option value="productName">Product Name</option>
+            <option value="catchPhrase">Catchphrase</option>
+            <option value="hospitalName">Hospital Name</option>
+            <option value="hospitalType">Hospital Type</option>
+            <option value="diseaseName">Disease Name</option>
+            <option value="medicineName">Medicine Name</option>
+            <option value="sha256">SHA 256</option>
+            <option value="futureDate">Future Date</option>
+            <option value="pastDate">Past Date</option>
+            <option value="boolean">Boolean (1/0)</option>
           </select>
         ),
       },
     ];
-  
+
     return (
       <div key={tableName} className="table-container">
-        <div className="table-header"> 
-              <h2>
-        {capitalizeFirstLetter(tableName)}
-        <span style={{ marginRight: '2px' }}></span>  {/* Add space here */}
-        <div className="record-count-badge">
-          <Badge
-            badgeContent={tableData.total_rows || 0}  // Number to display inside the badge
-            color="secondary"   // Badge color, can be "default", "primary", "secondary", etc.
-            overlap="circular"  // Badge will be circular (default behavior)
-            max={1000000}
-            showZero={true}
-            
-            style={{ width: '12px', height: '12px', minWidth: '22px', minHeight: '12px' }}
-          />
-        </div>
-      </h2>
+        <div className="table-header">
+          <h2>
+            {capitalizeFirstLetter(tableName)}
+            <span style={{ marginRight: "2px" }}></span> {/* Add space here */}
+            <div className="record-count-badge">
+              <Badge
+                badgeContent={tableData.total_rows || 0} // Number to display inside the badge
+                color="secondary" // Badge color, can be "default", "primary", "secondary", etc.
+                overlap="circular" // Badge will be circular (default behavior)
+                max={1000000}
+                showZero={true}
+                style={{
+                  width: "12px",
+                  height: "12px",
+                  minWidth: "22px",
+                  minHeight: "12px",
+                }}
+              />
+            </div>
+          </h2>
 
           <div className="header-controls">
             <div className="records-count-container">
@@ -354,83 +352,79 @@ function App() {
               <input
                 type="number"
                 value={recordCounts[tableName] || 10}
-                onChange={(e) => handleRecordCountChange(tableName, e.target.value)}
+                onChange={(e) =>
+                  handleRecordCountChange(tableName, e.target.value)
+                }
                 disabled={!isGenerateDataEnabled}
               />
-              
             </div>
             <div className="reusability-text-container">
-            <span>New  Keys Reuse % </span>
+              <span>New Keys Reuse % </span>
             </div>
 
             <div className="reusability-slider-container">
-            <Slider
-  defaultValue={30}
-  valueLabelDisplay="auto"
-  aria-label="Percentage Reusage"
-  size="small"
-  
-  disabled={tableData.isCentralTable || !isGenerateDataEnabled}
-  onChange={(e) =>
-    setReusabilityPct({ ...reusabilityPct, [tableName]: Number(e.target.value) })
-  }
-  sx={{
-    width: 70,
-    color: 'secondary',
-    '& .MuiSlider-thumb': {
-      borderRadius: '3px',
-    },
-  }}
-/>
-</div>          
-          
+              <Slider
+                defaultValue={30}
+                valueLabelDisplay="auto"
+                aria-label="Percentage Reusage"
+                size="small"
+                disabled={tableData.isCentralTable || !isGenerateDataEnabled}
+                onChange={(e) =>
+                  setReusabilityPct({
+                    ...reusabilityPct,
+                    [tableName]: Number(e.target.value),
+                  })
+                }
+                sx={{
+                  width: 70,
+                  color: "secondary",
+                  "& .MuiSlider-thumb": {
+                    borderRadius: "3px",
+                  },
+                }}
+              />
+            </div>
+
             <div className="truncate-table-container">
-              <label>
-                
-                Truncate Load
-              </label>
+              <label>Truncate Load</label>
             </div>
 
             <Checkbox
-      
-      checked={truncateTableState[tableName] || false}
-      onChange={() => handleTruncateTableToggle(tableName)}
-      icon={<DeleteOutlineIcon />} // Icon for unchecked state
-      checkedIcon={<DeleteIcon />} // Icon for checked state
-        sx={{
-          color: grey[600],
-          '&.Mui-checked': {
-            color: red[800],
-          },
-        }}
-      />
-
-
-
+              checked={truncateTableState[tableName] || false}
+              onChange={() => handleTruncateTableToggle(tableName)}
+              icon={<DeleteOutlineIcon />} // Icon for unchecked state
+              checkedIcon={<DeleteIcon />} // Icon for checked state
+              sx={{
+                color: grey[600],
+                "&.Mui-checked": {
+                  color: red[800],
+                },
+              }}
+            />
 
             <span className="generate-data-text">Generate Data</span>
             <Switch
-      checked={isGenerateDataEnabled || false}
-      onChange={() => handleGenerateDataToggle(tableName)}
-      color="default"
-      
-      sx={{
-        
-        '& .MuiSwitch-track': {
-          backgroundColor: isGenerateDataEnabled ? 'green' : 'red', // Track color based on state
-          borderRadius: 20, // Rounded corners for the track
-          opacity: 0.51, // Slight opacity for the track when unchecked
-          transition: 'background-color 0.2s ease', // Smooth transition for color change
-        },
-        '& .MuiSwitch-thumb': {
-          backgroundColor: isGenerateDataEnabled ? 'green' : 'red',  // Optional: make the thumb color consistent
-          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)', // Larger shadow on hover
-        }
-      }}
-    />
+              checked={isGenerateDataEnabled || false}
+              onChange={() => handleGenerateDataToggle(tableName)}
+              color="default"
+              sx={{
+                "& .MuiSwitch-track": {
+                  backgroundColor: isGenerateDataEnabled ? "green" : "red", // Track color based on state
+                  borderRadius: 20, // Rounded corners for the track
+                  opacity: 0.51, // Slight opacity for the track when unchecked
+                  transition: "background-color 0.2s ease", // Smooth transition for color change
+                },
+                "& .MuiSwitch-thumb": {
+                  backgroundColor: isGenerateDataEnabled ? "green" : "red", // Optional: make the thumb color consistent
+                  boxShadow: "0 2px 8px rgba(0, 0, 0, 0.3)", // Larger shadow on hover
+                },
+              }}
+            />
 
-            
-            <button className="collapse-button" onClick={() => toggleTable(tableName)}>
+            <button
+              className="collapse-button"
+              onClick={() => toggleTable(tableName)}
+            >
               {expandedTables[tableName] ? (
                 <FaCircleChevronUp size={20} />
               ) : (
@@ -440,37 +434,36 @@ function App() {
           </div>
         </div>
         <div
-          className={`table-content ${expandedTables[tableName] ? 'expanded' : 'collapsed'}`}
+          className={`table-content ${
+            expandedTables[tableName] ? "expanded" : "collapsed"
+          }`}
         >
-          <MaterialReactTable columns={columns} data={tableData.columns}
-
-          //enableClickToCopy={true}
-          enableColumnPinning={true}
-          enableStickyHeader={true}
-          enableFullScreenToggle={true} // Enable full-screen toggle
-          initialState={{
-            pagination: { pageIndex: 0, pageSize: pageSize  }, // Set default page size to 5
-            density: 'compact', // Set default density to 'comfortable'
-          }}
-          onFullScreenChange={handleFullScreenChange}
-
-          muiTableBodyRowProps={getRowProps}
-          
+          <MaterialReactTable
+            columns={columns}
+            data={tableData.columns}
+            //enableClickToCopy={true}
+            enableColumnPinning={true}
+            enableStickyHeader={true}
+            enableFullScreenToggle={true} // Enable full-screen toggle
+            initialState={{
+              pagination: { pageIndex: 0, pageSize: pageSize }, // Set default page size to 5
+              density: "compact", // Set default density to 'comfortable'
+            }}
+            onFullScreenChange={handleFullScreenChange}
+            muiTableBodyRowProps={getRowProps}
           />
         </div>
       </div>
     );
   };
-  
+
   const getRowProps = ({ row }) => ({
     sx: {
-      backgroundColor: row.index % 2 === 0 ? '#f2f2f2' : '#ffffff',
-      tableLayout: 'fixed', 
-
+      backgroundColor: row.index % 2 === 0 ? "#f2f2f2" : "#ffffff",
+      tableLayout: "fixed",
     },
   });
   const [pageSize, setPageSize] = useState(5); // Default page size is 5
-  
 
   // Callback for full-screen toggle
   const handleFullScreenChange = (isFullScreen) => {
@@ -497,7 +490,7 @@ function App() {
           truncate_table: truncateTableState[tableName] || false,
           existing_record_count: table.total_rows || 0,
           records_to_generate: Number(recordCounts[tableName]) || 10,
-          reusability_pct:reusabilityPct[tableName] ,
+          reusability_pct: reusabilityPct[tableName],
           columns: table.columns.map((column) => ({
             COLUMN_NAME: column.COLUMN_NAME,
             DATA_TYPE: column.DATA_TYPE,
@@ -505,9 +498,8 @@ function App() {
             PRIMARY_KEY: column.PRIMARY_KEY,
             NULLABLE: column.NULLABLE,
             IDENTITY: column.IDENTITY,
-            selected_generator: selectedGenerators[tableName]?.[column.COLUMN_NAME] || "",
-
-            
+            selected_generator:
+              selectedGenerators[tableName]?.[column.COLUMN_NAME] || "",
           })),
         };
         output[tableType][tableName] = tableData;
@@ -532,169 +524,165 @@ function App() {
     return JSON.stringify(output, null, 2);
   };
 
-
   const generateSyntheticData = async () => {
     try {
       setloadingGenerateSyntheticData(true);
       const jsonOutput = generateJsonOutput(); // Call the function that generates your JSON output
 
       // alert('The Json Data is'+JSON.stringify(jsonOutput, null, 2));
-      const response = await fetch('http://127.0.0.1:5001/submit', {
-        method: 'POST',
+      const response = await fetch("http://127.0.0.1:5001/submit", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
 
         body: jsonOutput,
       });
-  
+
       if (!response.ok) {
-        throw new Error('Failed to post JSON data');
+        throw new Error("Failed to post JSON data");
       }
-  
+
       // Handle the response
       const data = await response.json();
-      console.log('Post successful', data);
- 
-      setApiResponse(data);
-      setShowModal(true);  // Show modal with the response data
-      setloadingGenerateSyntheticData(false);
+      console.log("Post successful", data);
 
+      setApiResponse(data);
+      setShowModal(true); // Show modal with the response data
+      setloadingGenerateSyntheticData(false);
     } catch (error) {
-      console.error('Error posting JSON:', error);
-      alert('Error posting JSON data');
+      console.error("Error posting JSON:", error);
+      alert("Error posting JSON data");
       setloadingGenerateSyntheticData(false);
     }
   };
 
   return (
-
-    
     <div className="App">
-
-<div>
-      <CustomAppBar
-        title="Synthetic Data Generator"
-        onMenuClick={handleMenuClick}
-        isNightMode={isNightMode}
-        toggleMode={toggleNightMode}
-        actionButtons={[
-          
-          { icon: <GrSettingsOption size={22} />, onClick: () => handleButtonClick("Settings"), tooltip: "Settings" },
-          { icon: <MdOutlineHelpCenter   size={28} />, onClick: () => handleButtonClick("Help") , tooltip: "Help" },
-          { label: "Login", onClick: () => handleButtonClick("Login"), tooltip: "Login" },
-          
-        ]}
-      />
-      <div style={{ padding: '16px' }}>
-      
+      <div>
+        <CustomAppBar
+          title="Synthetic Data Generator"
+          onMenuClick={handleMenuClick}
+          isNightMode={isNightMode}
+          toggleMode={toggleNightMode}
+          actionButtons={[
+            {
+              icon: <GrSettingsOption size={22} />,
+              onClick: () => handleButtonClick("Settings"),
+              tooltip: "Settings",
+            },
+            {
+              icon: <MdOutlineHelpCenter size={28} />,
+              onClick: () => handleButtonClick("Help"),
+              tooltip: "Help",
+            },
+            {
+              label: "Login",
+              onClick: () => handleButtonClick("Login"),
+              tooltip: "Login",
+            },
+          ]}
+        />
+        <div style={{ padding: "16px" }}></div>
       </div>
-    </div>
 
+      <div className="input-container">
+        <MyTextField
+          tableName={tableName}
+          setTableName={setTableName}
+          isNightMode={isNightMode}
+          placeholder="Enter table name" // Custom placeholder
+          label="Table Name" // Custom label
+        />
 
-
-<div className="input-container">
-<MyTextField 
-        tableName={tableName} 
-        setTableName={setTableName} 
-        isNightMode={isNightMode} 
-        placeholder="Enter table name" // Custom placeholder
-        label="Table Name" // Custom label
-      />
-  
-  
-
-
-<LoadingButton
-sx={{
-  borderRadius: '15px',
-  backgroundColor: isNightMode ? '#333' : '#6200ea', // Dark background for night mode, purple for day mode
-  color: '#fff', // Ensure text is always white for contrast
-  '&:hover': {
-    backgroundColor: isNightMode ? '#444' : '#3700b3', // Lighter shade for hover in night mode
-  },
-  // Adjust spinner color for better visibility
-  '& .MuiCircularProgress-root': {
-    color: '#fff', // Set spinner color to white in both modes
-  },
-  // Make sure the button has proper contrast in night mode
-  boxShadow: isNightMode ? '0px 4px 6px rgba(0, 0, 0, 0.3)' : 'none', // Optional shadow to lift the button
-}}
-  size="small"
-  color="secondary"
-  endIcon={<TbDatabaseSearch />}
-  loadingPosition="end"
-  loading={loadingFetch}
-  variant="contained"
-  onClick={() => {
-    if (tableName.trim() === "") {
-      // Show snackbar or alert about empty table name
-      showSnackbar("Table name cannot be empty!", "warning");
-      return;
-    }
-    // Show confirmation dialog if table name is provided
-    handleOpenDialog(
-      handleFetchMetadata,
-      "Scan Metadata?",
-      "Are you sure you want to scan the database to fetch metadata? This action may take a few moments."
-    );
-  }}
->
-  Scan Metadata
-</LoadingButton>
-
-{/* <button onClick={generateJsonOutput}>Generate JSON</button> */}
-<LoadingButton  
-sx={{
-  borderRadius: '15px',
-  backgroundColor: isNightMode ? '#333' : '#6200ea', // Dark background for night mode, purple for day mode
-  color: '#fff', // Ensure text is always white for contrast
-  '&:hover': {
-    backgroundColor: isNightMode ? '#444' : '#3700b3', // Lighter shade for hover in night mode
-  },
-  // Adjust spinner color for better visibility
-  '& .MuiCircularProgress-root': {
-    color: '#fff', // Set spinner color to white in both modes
-  },
-  // Make sure the button has proper contrast in night mode
-  boxShadow: isNightMode ? '0px 4px 6px rgba(0, 0, 0, 0.3)' : 'none', // Optional shadow to lift the button
-}}
-              size="small"  
-              color="secondary"  
-              endIcon={<TbDatabaseImport />} 
-              loadingPosition="end" 
-              loading={loadingGenerateSyntheticData} 
-              variant="contained" 
-              onClick={() =>
-                handleOpenDialog(
-                  generateSyntheticData,
-                  "Generate Synthetic Data?",
-                  "Are you sure you want to generate synthetic data? This action may take a few moments."
-                )
-              }
-              
-              >
-                Generate Synthetic Data
+        <LoadingButton
+          sx={{
+            borderRadius: "15px",
+            backgroundColor: isNightMode ? "#333" : "#6200ea", // Dark background for night mode, purple for day mode
+            color: "#fff", // Ensure text is always white for contrast
+            "&:hover": {
+              backgroundColor: isNightMode ? "#444" : "#3700b3", // Lighter shade for hover in night mode
+            },
+            // Adjust spinner color for better visibility
+            "& .MuiCircularProgress-root": {
+              color: "#fff", // Set spinner color to white in both modes
+            },
+            // Make sure the button has proper contrast in night mode
+            boxShadow: isNightMode ? "0px 4px 6px rgba(0, 0, 0, 0.3)" : "none", // Optional shadow to lift the button
+          }}
+          size="small"
+          color="secondary"
+          endIcon={<TbDatabaseSearch />}
+          loadingPosition="end"
+          loading={loadingFetch}
+          variant="contained"
+          onClick={() => {
+            if (tableName.trim() === "") {
+              // Show snackbar or alert about empty table name
+              showSnackbar("Table name cannot be empty!", "warning");
+              return;
+            }
+            // Show confirmation dialog if table name is provided
+            handleOpenDialog(
+              handleFetchMetadata,
+              "Scan Metadata?",
+              "Are you sure you want to scan the database to fetch metadata? This action may take a few moments."
+            );
+          }}
+        >
+          Scan Metadata
         </LoadingButton>
 
-<SnackbarComponent
-        open={snackbarOpen}
-        message={snackbarMessage}
-        severity={snackbarSeverity}
-        onClose={handleSnackbarClose}
-        TransitionComponent={snackbarTransition}
-      />
+        {/* <button onClick={generateJsonOutput}>Generate JSON</button> */}
+        <LoadingButton
+          sx={{
+            borderRadius: "15px",
+            backgroundColor: isNightMode ? "#333" : "#6200ea", // Dark background for night mode, purple for day mode
+            color: "#fff", // Ensure text is always white for contrast
+            "&:hover": {
+              backgroundColor: isNightMode ? "#444" : "#3700b3", // Lighter shade for hover in night mode
+            },
+            // Adjust spinner color for better visibility
+            "& .MuiCircularProgress-root": {
+              color: "#fff", // Set spinner color to white in both modes
+            },
+            // Make sure the button has proper contrast in night mode
+            boxShadow: isNightMode ? "0px 4px 6px rgba(0, 0, 0, 0.3)" : "none", // Optional shadow to lift the button
+          }}
+          size="small"
+          color="secondary"
+          endIcon={<TbDatabaseImport />}
+          loadingPosition="end"
+          loading={loadingGenerateSyntheticData}
+          variant="contained"
+          onClick={() =>
+            handleOpenDialog(
+              generateSyntheticData,
+              "Generate Synthetic Data?",
+              "Are you sure you want to generate synthetic data? This action may take a few moments."
+            )
+          }
+        >
+          Generate Synthetic Data
+        </LoadingButton>
 
-<ConfirmationDialog
-        open={dialogOpen}
-        onClose={handleCloseDialog}
-        onConfirm={handleConfirm}
-        title={dialogTitle}
-        message={dialogMessage}
-        confirmText="Confirm"
-        cancelText="Cancel"
-      />
+        <SnackbarComponent
+          open={snackbarOpen}
+          message={snackbarMessage}
+          severity={snackbarSeverity}
+          onClose={handleSnackbarClose}
+          TransitionComponent={snackbarTransition}
+        />
 
+        <ConfirmationDialog
+          open={dialogOpen}
+          onClose={handleCloseDialog}
+          onConfirm={handleConfirm}
+          title={dialogTitle}
+          message={dialogMessage}
+          confirmText="Confirm"
+          cancelText="Cancel"
+        />
       </div>
       {metadata && (
         <div>
@@ -703,7 +691,10 @@ sx={{
               <div className="metadata-card">
                 <h3 className="metadata-title">Central Table</h3>
                 {metadata.central_table_metadata.map((table) =>
-                 renderTable(table.table_name, { ...table, isCentralTable: true })
+                  renderTable(table.table_name, {
+                    ...table,
+                    isCentralTable: true,
+                  })
                 )}
               </div>
             </div>
@@ -730,17 +721,19 @@ sx={{
           )}
         </div>
       )}
-     {showModal && <FinalResponse message="Data generation successful!" data={apiResponse} closeModal={closeModal} />}
+      {showModal && (
+        <FinalResponse
+          message="Data generation successful!"
+          data={apiResponse}
+          closeModal={closeModal}
+        />
+      )}
     </div>
-    
   );
 }
 
 const capitalizeFirstLetter = (string) => {
   return string.charAt(0).toUpperCase() + string.slice(1);
 };
-
-
-
 
 export default App;
