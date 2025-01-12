@@ -1,14 +1,20 @@
 import React, { useState } from "react";
 import { FaCircleChevronUp ,FaCircleChevronDown } from "react-icons/fa6";
 import { TfiKey } from "react-icons/tfi";
+import TextField from '@mui/material/TextField';
+
+import InputAdornment from "@mui/material/InputAdornment";
+import IconButton from "@mui/material/IconButton";
+import ClearIcon from "@mui/icons-material/Clear";
 
 import FinalResponse from "./components/FinalResponse";
 import ConfirmationDialog from "./components/ConfirmationDialog";
 import CustomAppBar from "./components/CustomAppBar";
+import SnackbarComponent from "./components/SnackbarComponent";
 
 import LoadingButton from '@mui/lab/LoadingButton';
 
-import { TbDatabaseSearch } from "react-icons/tb";
+import { TbDatabaseSearch,TbDatabaseImport } from "react-icons/tb";
 import { GrSettingsOption } from "react-icons/gr";
 import { MdOutlineHelpCenter  } from "react-icons/md";
 
@@ -47,12 +53,40 @@ function App() {
 
 
   const [loadingFetch, setLoadingFetch] = useState(false);
+  const [loadingGenerateSyntheticData, setloadingGenerateSyntheticData] = useState(false);
+
+
 
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [currentAction, setCurrentAction] = useState(null); // Stores the function to execute
+  const [currentAction, setCurrentAction] = useState(null);
+  const [dialogTitle, setDialogTitle] = useState("");
+  const [dialogMessage, setDialogMessage] = useState("");
 
-  const handleOpenDialog = (action) => {
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbarSeverity, setSnackbarSeverity] = useState("info");
+  const [snackbarTransition, setSnackbarTransition] = useState(undefined);
+
+  const handleSnackbarClose = (event, reason) => {
+    if (reason === "clickaway") return;
+    setSnackbarOpen(false);
+  };
+
+  const handleClear = () => {
+    setTableName(""); // Clear the input field
+  };
+  
+  const showSnackbar = (message, severity, transition = undefined) => {
+    setSnackbarMessage(message);
+    setSnackbarSeverity(severity);
+    setSnackbarTransition(() => transition || undefined);
+    setSnackbarOpen(true);
+  };
+
+  const handleOpenDialog = (action, title, message) => {
     setCurrentAction(() => action); // Set the function to execute
+    setDialogTitle(title); // Set the title for the dialog
+    setDialogMessage(message); // Set the message for the dialog
     setDialogOpen(true); // Open the confirmation dialog
   };
 
@@ -498,6 +532,7 @@ function App() {
 
   const generateSyntheticData = async () => {
     try {
+      setloadingGenerateSyntheticData(true);
       const jsonOutput = generateJsonOutput(); // Call the function that generates your JSON output
 
       // alert('The Json Data is'+JSON.stringify(jsonOutput, null, 2));
@@ -520,10 +555,12 @@ function App() {
  
       setApiResponse(data);
       setShowModal(true);  // Show modal with the response data
+      setloadingGenerateSyntheticData(false);
 
     } catch (error) {
       console.error('Error posting JSON:', error);
       alert('Error posting JSON data');
+      setloadingGenerateSyntheticData(false);
     }
   };
 
@@ -553,26 +590,118 @@ function App() {
 
 
       
-      <div className="input-container">
-        <input
-          type="text"
-          value={tableName}
-          onChange={(e) => setTableName(e.target.value)}
-          placeholder="Enter table name"
-        />
-        <LoadingButton  sx={{ borderRadius: '15px' }} size="large"  color="secondary"  endIcon={<TbDatabaseSearch />} loadingPosition="end" loading={loadingFetch} variant="contained" onClick={() => handleOpenDialog(handleFetchMetadata)}>Scan Metadata </LoadingButton>
-        <button onClick={generateJsonOutput}>Generate JSON</button>
-        <button onClick={generateSyntheticData}>Generate Synthetic Data</button>
-        <ConfirmationDialog
+
+
+<div className="input-container">
+<TextField
+      value={tableName}
+      required
+      onChange={(e) => setTableName(e.target.value)}
+      placeholder="Enter table name"
+      label="Table Name"
+      variant="outlined"
+      slotProps={{
+        input: {
+          endAdornment: (
+            <InputAdornment
+              position="end"
+              sx={{
+                width: "36px", // Reserve space for the icon
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              {tableName && (
+                <IconButton
+                  onClick={handleClear}
+                  edge="end"
+                  size="small"
+                  sx={{
+                    padding: 0, // Ensure minimal padding
+                  }}
+                >
+                  <ClearIcon fontSize="small" />
+                </IconButton>
+              )}
+            </InputAdornment>
+          ),
+        },
+      }}
+      sx={{
+        "& .MuiOutlinedInput-root": {
+          height: "50px", // Consistent height for the input box
+          borderRadius: 15, // Rounded corners
+        },
+      }}
+    />
+  
+  
+
+
+<LoadingButton
+  sx={{ borderRadius: '15px' }}
+  size="small"
+  color="secondary"
+  endIcon={<TbDatabaseSearch />}
+  loadingPosition="end"
+  loading={loadingFetch}
+  variant="contained"
+  onClick={() => {
+    if (tableName.trim() === "") {
+      // Show snackbar or alert about empty table name
+      showSnackbar("Table name cannot be empty!", "warning");
+      return;
+    }
+    // Show confirmation dialog if table name is provided
+    handleOpenDialog(
+      handleFetchMetadata,
+      "Scan Metadata?",
+      "Are you sure you want to scan the database to fetch metadata? This action may take a few moments."
+    );
+  }}
+>
+  Scan Metadata
+</LoadingButton>
+
+<button onClick={generateJsonOutput}>Generate JSON</button>
+<LoadingButton  
+              sx={{ borderRadius: '15px' }} 
+              size="small"  
+              color="secondary"  
+              endIcon={<TbDatabaseImport />} 
+              loadingPosition="end" 
+              loading={loadingGenerateSyntheticData} 
+              variant="contained" 
+              onClick={() =>
+                handleOpenDialog(
+                  generateSyntheticData,
+                  "Generate Synthetic Data?",
+                  "Are you sure you want to generate synthetic data? This action may take a few moments."
+                )
+              }
+              
+              >
+                Generate Synthetic Data
+        </LoadingButton>
+
+<SnackbarComponent
+        open={snackbarOpen}
+        message={snackbarMessage}
+        severity={snackbarSeverity}
+        onClose={handleSnackbarClose}
+        TransitionComponent={snackbarTransition}
+      />
+
+<ConfirmationDialog
         open={dialogOpen}
         onClose={handleCloseDialog}
         onConfirm={handleConfirm}
-        title="Scan Metadata?"
-        message="Are you sure you want to scan the database to fetch metadata? This action may take a few moments."
-        confirmText="Scan"
+        title={dialogTitle}
+        message={dialogMessage}
+        confirmText="Confirm"
         cancelText="Cancel"
       />
-
 
       </div>
       {metadata && (

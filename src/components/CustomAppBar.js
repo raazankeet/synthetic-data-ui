@@ -7,7 +7,7 @@ import MenuIcon from '@mui/icons-material/Menu'; // Example of a menu icon
 import Button from '@mui/material/Button';
 import { Box } from '@mui/material';
 import Tooltip from '@mui/material/Tooltip'; // Import Tooltip component
-import { TbHome } from 'react-icons/tb'; // Example of a custom icon
+
 import { TbTableSpark } from "react-icons/tb";
 import Brightness7Icon from '@mui/icons-material/Brightness7'; // Day icon
 import Brightness3Icon from '@mui/icons-material/Brightness3'; // Night icon
@@ -81,9 +81,11 @@ const CustomAppBar = ({
           </Box>
 
           {/* Day/Night Mode Toggle */}
-          <IconButton color="inherit" onClick={toggleMode}>
-            {isNightMode ? <Brightness3Icon /> : <Brightness7Icon />}
-          </IconButton>
+          <Tooltip title={isNightMode ? "Switch to Day Mode" : "Switch to Night Mode"} arrow>
+  <IconButton color="inherit" onClick={toggleMode}>
+    {isNightMode ? <Brightness3Icon /> : <Brightness7Icon />}
+  </IconButton>
+</Tooltip>
         </Toolbar>
       </AppBar>
 
