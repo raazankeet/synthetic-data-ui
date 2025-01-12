@@ -11,6 +11,25 @@ body {
   box-sizing: border-box;
 }
 
+/* WebKit Browsers */
+::-webkit-scrollbar {
+  width: 8px; /* Adjust the width */
+}
+::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.5); /* Thumb color */
+  border-radius: 4px; /* Rounded edges */
+}
+::-webkit-scrollbar-track {
+  background-color: rgba(0, 0, 0, 0.1); /* Track color */
+}
+
+/* Firefox */
+html {
+  scrollbar-width: thin; /* Thin scrollbar */
+  scrollbar-color: rgba(0, 0, 0, 0.5) rgba(0, 0, 0, 0.1); /* Thumb and track colors */
+}
+
+
 html {
   scrollbar-gutter: stable; /* Reserve space for scrollbar */
 }
