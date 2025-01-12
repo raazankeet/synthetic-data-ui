@@ -1,11 +1,7 @@
 import React, { useState } from "react";
 import { FaCircleChevronUp ,FaCircleChevronDown } from "react-icons/fa6";
 import { TfiKey } from "react-icons/tfi";
-import TextField from '@mui/material/TextField';
 
-import InputAdornment from "@mui/material/InputAdornment";
-import IconButton from "@mui/material/IconButton";
-import ClearIcon from "@mui/icons-material/Clear";
 
 import FinalResponse from "./components/FinalResponse";
 import ConfirmationDialog from "./components/ConfirmationDialog";
@@ -33,8 +29,10 @@ import { grey,red } from '@mui/material/colors';
 import DeleteIcon from '@mui/icons-material/Delete'; // Icon for checked state
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'; // Icon for unchecked state
 
+import MyTextField from "./components/MyTextField";
 
 import "./App.css";
+
 
 
 
@@ -67,14 +65,19 @@ function App() {
   const [snackbarSeverity, setSnackbarSeverity] = useState("info");
   const [snackbarTransition, setSnackbarTransition] = useState(undefined);
 
+  const [isNightMode, setIsNightMode] = useState(false);
+
+    // Toggle day/night mode
+    const toggleNightMode = () => {
+      setIsNightMode(prevMode => !prevMode);
+    };
+
   const handleSnackbarClose = (event, reason) => {
     if (reason === "clickaway") return;
     setSnackbarOpen(false);
   };
 
-  const handleClear = () => {
-    setTableName(""); // Clear the input field
-  };
+
   
   const showSnackbar = (message, severity, transition = undefined) => {
     setSnackbarMessage(message);
@@ -573,6 +576,8 @@ function App() {
       <CustomAppBar
         title="Synthetic Data Generator"
         onMenuClick={handleMenuClick}
+        isNightMode={isNightMode}
+        toggleMode={toggleNightMode}
         actionButtons={[
           
           { icon: <GrSettingsOption size={22} />, onClick: () => handleButtonClick("Settings"), tooltip: "Settings" },
@@ -588,59 +593,33 @@ function App() {
 
 
 
-
-      
-
-
 <div className="input-container">
-<TextField
-      value={tableName}
-      required
-      onChange={(e) => setTableName(e.target.value)}
-      placeholder="Enter table name"
-      label="Table Name"
-      variant="outlined"
-      slotProps={{
-        input: {
-          endAdornment: (
-            <InputAdornment
-              position="end"
-              sx={{
-                width: "36px", // Reserve space for the icon
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-            >
-              {tableName && (
-                <IconButton
-                  onClick={handleClear}
-                  edge="end"
-                  size="small"
-                  sx={{
-                    padding: 0, // Ensure minimal padding
-                  }}
-                >
-                  <ClearIcon fontSize="small" />
-                </IconButton>
-              )}
-            </InputAdornment>
-          ),
-        },
-      }}
-      sx={{
-        "& .MuiOutlinedInput-root": {
-          height: "50px", // Consistent height for the input box
-          borderRadius: 15, // Rounded corners
-        },
-      }}
-    />
+<MyTextField 
+        tableName={tableName} 
+        setTableName={setTableName} 
+        isNightMode={isNightMode} 
+        placeholder="Enter table name" // Custom placeholder
+        label="Table Name" // Custom label
+      />
   
   
 
 
 <LoadingButton
-  sx={{ borderRadius: '15px' }}
+sx={{
+  borderRadius: '15px',
+  backgroundColor: isNightMode ? '#333' : '#6200ea', // Dark background for night mode, purple for day mode
+  color: '#fff', // Ensure text is always white for contrast
+  '&:hover': {
+    backgroundColor: isNightMode ? '#444' : '#3700b3', // Lighter shade for hover in night mode
+  },
+  // Adjust spinner color for better visibility
+  '& .MuiCircularProgress-root': {
+    color: '#fff', // Set spinner color to white in both modes
+  },
+  // Make sure the button has proper contrast in night mode
+  boxShadow: isNightMode ? '0px 4px 6px rgba(0, 0, 0, 0.3)' : 'none', // Optional shadow to lift the button
+}}
   size="small"
   color="secondary"
   endIcon={<TbDatabaseSearch />}
@@ -664,9 +643,22 @@ function App() {
   Scan Metadata
 </LoadingButton>
 
-<button onClick={generateJsonOutput}>Generate JSON</button>
+{/* <button onClick={generateJsonOutput}>Generate JSON</button> */}
 <LoadingButton  
-              sx={{ borderRadius: '15px' }} 
+sx={{
+  borderRadius: '15px',
+  backgroundColor: isNightMode ? '#333' : '#6200ea', // Dark background for night mode, purple for day mode
+  color: '#fff', // Ensure text is always white for contrast
+  '&:hover': {
+    backgroundColor: isNightMode ? '#444' : '#3700b3', // Lighter shade for hover in night mode
+  },
+  // Adjust spinner color for better visibility
+  '& .MuiCircularProgress-root': {
+    color: '#fff', // Set spinner color to white in both modes
+  },
+  // Make sure the button has proper contrast in night mode
+  boxShadow: isNightMode ? '0px 4px 6px rgba(0, 0, 0, 0.3)' : 'none', // Optional shadow to lift the button
+}}
               size="small"  
               color="secondary"  
               endIcon={<TbDatabaseImport />} 
