@@ -85,7 +85,7 @@ const CustomAppBar = ({
               onClick={toggleMode}
               sx={{
                 transition: 'transform 0.5s ease-in-out, scale 0.5s ease-in-out, box-shadow 0.5s ease-in-out', // Smooth transition for scaling and shadow
-                transform: isNightMode ? 'scale(0.7) rotate(-180deg)' : 'scale(1) rotate(0deg)', // Scale and rotate simultaneously
+                transform: isNightMode ? 'scale(0.6) rotate(-180deg)' : 'scale(0.9) rotate(0deg)', // Scale and rotate simultaneously
                 boxShadow: isNightMode ? '0px 0px 10px 5px rgba(0, 0, 0, 0.8)' : '0px 0px 15px 5px rgba(255, 204, 0, 0.6)', // Glowing effect for the sun in day mode
               }}
             >
