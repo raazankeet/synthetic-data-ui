@@ -127,9 +127,10 @@ const [isNightMode, setIsNightMode] = useState(false);
           }
           // Handle other non-200 errors
           return response.json().then((errorData) => {
-            showSnackbar(errorData.message || `Error: ${response.statusText}`, "error");
+            const errorMessage = errorData.error || `Error: ${response.statusText}`;
+            showSnackbar(errorMessage, "error");
             setLoadingFetch(false);
-            throw new Error(errorData.message || `HTTP error: ${response.status}`);
+            throw new Error(errorMessage);
           });
         }
         return response.json();
