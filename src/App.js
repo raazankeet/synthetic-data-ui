@@ -109,19 +109,35 @@ const [isNightMode, setIsNightMode] = useState(false);
   // Fetch metadata from API
   const handleFetchMetadata = () => {
     setLoadingFetch(true);
+  
     if (tableName.trim() === "") {
-      alert("Please enter a table name!");
+      showSnackbar("Please enter a table name!", "error");
       setLoadingFetch(false);
       return;
     }
-
+  
     fetch(`http://127.0.0.1:5000/get_metadata?table_name=${tableName}`)
-      .then((response) => response.json())
+      .then((response) => {
+        if (!response.ok) {
+          // Handle specific 404 error
+          if (response.status === 404) {
+            showSnackbar("Table name doesn't exist in catalog!", "error");
+            setLoadingFetch(false);
+            throw new Error("404 Not Found");
+          }
+          // Handle other non-200 errors
+          return response.json().then((errorData) => {
+            showSnackbar(errorData.message || `Error: ${response.statusText}`, "error");
+            setLoadingFetch(false);
+            throw new Error(errorData.message || `HTTP error: ${response.status}`);
+          });
+        }
+        return response.json();
+      })
       .then((data) => {
         setMetadata(data);
-
         setLoadingFetch(false);
-
+  
         setExpandedTables({
           central: true,
           ...data.central_table_metadata.reduce((acc, table) => {
@@ -137,7 +153,7 @@ const [isNightMode, setIsNightMode] = useState(false);
             return acc;
           }, {}),
         });
-
+  
         setGenerateDataState({
           ...data.central_table_metadata.reduce((acc, table) => {
             acc[table.table_name] = true;
@@ -152,7 +168,7 @@ const [isNightMode, setIsNightMode] = useState(false);
             return acc;
           }, {}),
         });
-
+  
         setRecordCounts({
           ...data.central_table_metadata.reduce((acc, table) => {
             acc[table.table_name] = 10;
@@ -167,7 +183,7 @@ const [isNightMode, setIsNightMode] = useState(false);
             return acc;
           }, {}),
         });
-
+  
         setTruncateTableState({
           ...data.central_table_metadata.reduce((acc, table) => {
             acc[table.table_name] = false;
@@ -183,9 +199,11 @@ const [isNightMode, setIsNightMode] = useState(false);
           }, {}),
         });
       })
-
-      .catch((error) => console.error("Error fetching metadata:", error));
+      .catch((error) => {
+        console.error("Error fetching metadata:", error);
+      });
   };
+  
 
   const toggleTable = (tableName) => {
     setExpandedTables((prevState) => ({
