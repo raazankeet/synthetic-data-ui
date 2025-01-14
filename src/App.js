@@ -106,6 +106,23 @@ const [isNightMode, setIsNightMode] = useState(false);
     setShowModal(false);
   };
 
+// Helper function to create a state object for table-related states with custom values
+const createTableState = (data, centralValue, parentValue, childValue) => {
+  return [
+    ...data.central_table_metadata.map((table) => ({
+      [table.table_name]: centralValue,
+    })),
+    ...data.parent_tables_metadata.map((table) => ({
+      [table.table_name]: parentValue,
+    })),
+    ...data.child_tables_metadata.map((table) => ({
+      [table.table_name]: childValue,
+    })),
+  ].reduce((acc, current) => {
+    return { ...acc, ...current };
+  }, {});
+};
+
   // Fetch metadata from API
   const handleFetchMetadata = () => {
     setLoadingFetch(true);
@@ -121,7 +138,7 @@ const [isNightMode, setIsNightMode] = useState(false);
         if (!response.ok) {
           // Handle specific 404 error
           if (response.status === 404) {
-            showSnackbar("Table name doesn't exist in catalog!", "error");
+            showSnackbar(`Table ${tableName} doesn't exist in catalog!`, "error");
             setLoadingFetch(false);
             throw new Error("404 Not Found");
           }
@@ -139,66 +156,10 @@ const [isNightMode, setIsNightMode] = useState(false);
         setMetadata(data);
         setLoadingFetch(false);
   
-        setExpandedTables({
-          central: true,
-          ...data.central_table_metadata.reduce((acc, table) => {
-            acc[table.table_name] = false;
-            return acc;
-          }, {}),
-          ...data.parent_tables_metadata.reduce((acc, table) => {
-            acc[table.table_name] = false;
-            return acc;
-          }, {}),
-          ...data.child_tables_metadata.reduce((acc, table) => {
-            acc[table.table_name] = false;
-            return acc;
-          }, {}),
-        });
-  
-        setGenerateDataState({
-          ...data.central_table_metadata.reduce((acc, table) => {
-            acc[table.table_name] = true;
-            return acc;
-          }, {}),
-          ...data.parent_tables_metadata.reduce((acc, table) => {
-            acc[table.table_name] = false;
-            return acc;
-          }, {}),
-          ...data.child_tables_metadata.reduce((acc, table) => {
-            acc[table.table_name] = false;
-            return acc;
-          }, {}),
-        });
-  
-        setRecordCounts({
-          ...data.central_table_metadata.reduce((acc, table) => {
-            acc[table.table_name] = 10;
-            return acc;
-          }, {}),
-          ...data.parent_tables_metadata.reduce((acc, table) => {
-            acc[table.table_name] = 10;
-            return acc;
-          }, {}),
-          ...data.child_tables_metadata.reduce((acc, table) => {
-            acc[table.table_name] = 10;
-            return acc;
-          }, {}),
-        });
-  
-        setTruncateTableState({
-          ...data.central_table_metadata.reduce((acc, table) => {
-            acc[table.table_name] = false;
-            return acc;
-          }, {}),
-          ...data.parent_tables_metadata.reduce((acc, table) => {
-            acc[table.table_name] = false;
-            return acc;
-          }, {}),
-          ...data.child_tables_metadata.reduce((acc, table) => {
-            acc[table.table_name] = false;
-            return acc;
-          }, {}),
-        });
+        setExpandedTables(createTableState(data, false, false, false));  // All tables are collapsed initially
+        setGenerateDataState(createTableState(data, true, false, false));  // Central tables are set to true, others are false
+    setRecordCounts(createTableState(data, 10, 10, 10));  // All tables have a record count of 10
+setTruncateTableState(createTableState(data, false, false, false));  // No truncation enabled initially
       })
       .catch((error) => {
         console.error("Error fetching metadata:", error);
