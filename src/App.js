@@ -133,38 +133,74 @@ const createTableState = (data, centralValue, parentValue, childValue) => {
       return;
     }
   
-    fetch(`http://127.0.0.1:5000/get_metadata?table_name=${tableName}`)
-      .then((response) => {
-        if (!response.ok) {
-          // Handle specific 404 error
-          if (response.status === 404) {
-            showSnackbar(`Table ${tableName} doesn't exist in catalog!`, "error");
-            setLoadingFetch(false);
-            throw new Error("404 Not Found");
-          }
-          // Handle other non-200 errors
-          return response.json().then((errorData) => {
-            const errorMessage = errorData.error || `Error: ${response.statusText}`;
-            showSnackbar(errorMessage, "error");
-            setLoadingFetch(false);
-            throw new Error(errorMessage);
-          });
-        }
-        return response.json();
-      })
-      .then((data) => {
-        setMetadata(data);
-        setLoadingFetch(false);
+    // Function to check if the error is network-related (connection refused, timeout, etc.)
+    const isNetworkError = (error) => {
+      return (
+        error.message &&
+        (
+          error.message.includes('ERR_CONNECTION_REFUSED') ||  // Connection refused
+          error instanceof TypeError ||  // Other network-related issues
+          error.message.toLowerCase().includes('network') ||  // Generic network issues
+          error.message.toLowerCase().includes('timeout')  // Timeout errors
+        )
+      );
+    };
   
-        setExpandedTables(createTableState(data, false, false, false));  // All tables are collapsed initially
-        setGenerateDataState(createTableState(data, true, false, false));  // Central tables are set to true, others are false
-    setRecordCounts(createTableState(data, 10, 10, 10));  // All tables have a record count of 10
-setTruncateTableState(createTableState(data, false, false, false));  // No truncation enabled initially
-      })
-      .catch((error) => {
-        console.error("Error fetching metadata:", error);
-      });
+    const maxRetries = 3; // Max number of retries
+    const retryDelay = 1000; // Initial delay in milliseconds
+  
+    const fetchWithRetry = (retriesLeft) => {
+      fetch(`http://127.0.0.1:5000/get_metadata?table_name=${tableName}`)
+        .then((response) => {
+          if (!response.ok) {
+            if (response.status === 404) {
+              showSnackbar(`Table ${tableName} doesn't exist in catalog!`, "error");
+              setLoadingFetch(false);
+              throw new Error("404 Not Found");
+            }
+            // Handle other non-200 errors
+            return response.json().then((errorData) => {
+              const errorMessage = errorData.error || `Error: ${response.statusText}`;
+              showSnackbar(errorMessage, "error");
+              setLoadingFetch(false);
+              throw new Error(errorMessage);
+            });
+          }
+          return response.json();
+        })
+        .then((data) => {
+          setMetadata(data);
+          setLoadingFetch(false);
+  
+          setExpandedTables(createTableState(data, false, false, false));  // All tables collapsed initially
+          setGenerateDataState(createTableState(data, true, false, false));  // Central tables set to true, others false
+          setRecordCounts(createTableState(data, 10, 10, 10));  // All tables have 10 records
+          setTruncateTableState(createTableState(data, false, false, false));  // No truncation enabled
+  
+        })
+        .catch((error) => {
+          if (isNetworkError(error) && retriesLeft > 0) {
+            // Retry logic with exponential backoff for network errors
+            setTimeout(() => {
+              fetchWithRetry(retriesLeft - 1);
+            }, retryDelay * Math.pow(2, maxRetries - retriesLeft)); // Exponential backoff
+          } else {
+            // Handle non-network errors or retries exhausted
+            console.error("Error fetching metadata:", error);
+            if (isNetworkError(error)) {
+              showSnackbar("The scanner service is down, please try again later.", "error");
+            } else {
+              const errorMessage = error.message || "An error occurred while fetching metadata.";
+            showSnackbar(errorMessage, "error");
+            }
+            setLoadingFetch(false);
+          }
+        });
+    };
+  
+    fetchWithRetry(maxRetries); // Start the fetch with max retries
   };
+  
   
 
   const toggleTable = (tableName) => {
