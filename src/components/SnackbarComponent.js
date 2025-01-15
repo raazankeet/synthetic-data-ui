@@ -28,6 +28,7 @@ const SnackbarComponent = ({
       onClose={onClose}
       TransitionComponent={TransitionComponent}
       anchorOrigin={{ vertical: "top", horizontal: "right" }}
+      sx={{ mt: 6 }}
     >
       <Alert onClose={onClose} severity={severity} sx={{ width: "100%" }}>
         {message}
