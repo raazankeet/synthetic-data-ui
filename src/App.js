@@ -25,6 +25,7 @@ import CustomSlider from "./components/CustomSlider";
 import CustomLoadingButton from "./components/CustomLoadingButton";
 import CustomSwitch from "./components/CustomSwitch";
 import CustomCheckbox from "./components/CustomCheckbox";
+import CustomConfidenceBar from "./components/CustomConfidenceBar";
 
 
 
@@ -297,6 +298,17 @@ const createTableState = (data, centralValue, parentValue, childValue) => {
         ),
         
       },
+
+      {
+        accessorKey: "Confidence", 
+        header: "Generator Confidence", 
+        Cell: ({ row }) => (
+          // <div>{selectedGenerators[tableName]?.[row.original.COLUMN_NAME]?.confidence || '-'}%</div> 
+           <CustomConfidenceBar percentage={selectedGenerators[tableName]?.[row.original.COLUMN_NAME]?.confidence || 0} />
+          // <CustomConfidenceBar percentage={93}/>
+        )
+      },
+
     ];
 
     return (
