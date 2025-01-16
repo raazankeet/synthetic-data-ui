@@ -10,10 +10,7 @@ import { MdOutlineHelpCenter } from "react-icons/md";
 
 // Material UI imports
 import { MaterialReactTable } from "material-react-table";
-import Checkbox from "@mui/material/Checkbox";
-import { grey, red } from "@mui/material/colors";
-import DeleteIcon from "@mui/icons-material/Delete"; // Icon for checked state
-import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline"; // Icon for unchecked state
+
 
 
 // Custom Components
@@ -27,6 +24,9 @@ import CustomBadge from "./components/CustomBadge"
 import CustomSlider from "./components/CustomSlider";
 import CustomLoadingButton from "./components/CustomLoadingButton";
 import CustomSwitch from "./components/CustomSwitch";
+import CustomCheckbox from "./components/CustomCheckbox";
+
+
 
 
 import "./App.css";
@@ -130,7 +130,7 @@ const createTableState = (data, centralValue, parentValue, childValue) => {
     setLoadingFetch(true);
   
     if (tableName.trim() === "") {
-      showSnackbar("Please enter a table name!", "error");
+      showSnackbar("Please enter a table name!", "warning");
       setLoadingFetch(false);
       return;
     }
@@ -342,35 +342,21 @@ const createTableState = (data, centralValue, parentValue, childValue) => {
               <label>Truncate Load</label>
             </div>
 
-            <Checkbox
+          <CustomCheckbox
               checked={truncateTableState[tableName] || false}
               onChange={() => handleTruncateTableToggle(tableName)}
-              icon={<DeleteOutlineIcon />} // Icon for unchecked state
-              checkedIcon={<DeleteIcon />} // Icon for checked state
-              sx={{
-                color: grey[600],
-                "&.Mui-checked": {
-                  color: red[800],
-                },
-              }}
             />
 
             <span className="generate-data-text">Generate Data</span>
             <CustomSwitch
         checked={isGenerateDataEnabled || false}
         onChange={() => handleGenerateDataToggle(tableName)}
-      />
+            />
 
-            <button
-              className="collapse-button"
-              onClick={() => toggleTable(tableName)}
-            >
-              {expandedTables[tableName] ? (
-                <FaCircleChevronUp size={20} />
-              ) : (
-                <FaCircleChevronDown size={20} />
-              )}
+            <button className="collapse-button" onClick={() => toggleTable(tableName)} >
+              {expandedTables[tableName] ? ( <FaCircleChevronUp size={20} /> ) : ( <FaCircleChevronDown size={20} /> )}
             </button>
+
           </div>
         </div>
         <div
@@ -539,7 +525,7 @@ const createTableState = (data, centralValue, parentValue, childValue) => {
                 isNightMode={isNightMode}
                 loading={loadingFetch}
                 handleOpenDialog={handleOpenDialog}
-                actionFunction={handleFetchMetadata} // Function to call
+                actionFunction={handleFetchMetadata} 
                 dialogTitle="Scan Metadata?"
                 dialogMessage="Are you sure you want to scan the database to fetch metadata? This action may take a few moments."
                 text="Scan Metadata"
@@ -552,7 +538,7 @@ const createTableState = (data, centralValue, parentValue, childValue) => {
         isNightMode={isNightMode}
         loading={loadingGenerateSyntheticData}
         handleOpenDialog={handleOpenDialog}
-        actionFunction={generateSyntheticData} // Function to call
+        actionFunction={generateSyntheticData} 
         dialogTitle="Generate Synthetic Data?"
         dialogMessage="Are you sure you want to generate synthetic data? This action may take a few moments."
         text="Generate Synthetic Data"
