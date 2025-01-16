@@ -10,14 +10,11 @@ import { MdOutlineHelpCenter } from "react-icons/md";
 
 // Material UI imports
 import { MaterialReactTable } from "material-react-table";
-import Switch from "@mui/material/Switch";
-import Badge from '@mui/material/Badge';
 import Checkbox from "@mui/material/Checkbox";
-import Slider from "@mui/material/Slider";
 import { grey, red } from "@mui/material/colors";
 import DeleteIcon from "@mui/icons-material/Delete"; // Icon for checked state
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline"; // Icon for unchecked state
-import LoadingButton from "@mui/lab/LoadingButton";
+
 
 // Custom Components
 import FinalResponse from "./components/FinalResponse";
@@ -25,6 +22,11 @@ import ConfirmationDialog from "./components/ConfirmationDialog";
 import CustomAppBar from "./components/CustomAppBar";
 import SnackbarComponent from "./components/SnackbarComponent";
 import MyTextField from "./components/MyTextField";
+import GeneratorSelect from "./components/GeneratorSelect"
+import CustomBadge from "./components/CustomBadge"
+import CustomSlider from "./components/CustomSlider";
+import CustomLoadingButton from "./components/CustomLoadingButton";
+import CustomSwitch from "./components/CustomSwitch";
 
 
 import "./App.css";
@@ -282,60 +284,18 @@ const createTableState = (data, centralValue, parentValue, childValue) => {
       {
         accessorKey: "GENERATOR",
         header: "Generator",
+
         Cell: ({ cell }) => (
-          <select
-            disabled={!isGenerateDataEnabled}
-            value={
-              selectedGenerators[tableName]?.[cell.row.original.COLUMN_NAME] ||
-              ""
-            }
-            onChange={(e) =>
-              handleGeneratorChange(
-                tableName,
-                cell.row.original.COLUMN_NAME,
-                e.target.value
-              )
-            }
-          >
-            <option value="">Select Generator</option>
-            <option value="firstName">First Name</option>
-            <option value="lastName">Last Name</option>
-            <option value="fullName">Full Name</option>
-            <option value="gender">Gender</option>
-            <option value="phoneNumber">Phone Number</option>
-            <option value="city">City</option>
-            <option value="state">State</option>
-            <option value="zipcode">Zip Code</option>
-            <option value="addressline1">Address Line 1</option>
-            <option value="addressline2">Address Line 2</option>
-            <option value="fullAddress">Full Address</option>
-            <option value="ssn">SSN</option>
-            <option value="emailID">Email</option>
-            <option value="bookName">Book Name</option>
-            <option value="bookAuthor">Book Author</option>
-            <option value="weather">Weather</option>
-            <option value="temperature">Temperature</option>
-            <option value="creditCardNumber">Credit Card Number</option>
-            <option value="dollarAmount">Dollar Amount</option>
-            <option value="randomNumber">Random Number</option>
-            <option value="artistName">Artist Name</option>
-            <option value="regex">Regular Expression (Regex)</option>
-            <option value="quotes">Movie Quotes</option>
-            <option value="sentences">Sentences</option>
-            <option value="ancientGod">Ancient God</option>
-            <option value="animalName">Animal Name</option>
-            <option value="productName">Product Name</option>
-            <option value="catchPhrase">Catchphrase</option>
-            <option value="hospitalName">Hospital Name</option>
-            <option value="hospitalType">Hospital Type</option>
-            <option value="diseaseName">Disease Name</option>
-            <option value="medicineName">Medicine Name</option>
-            <option value="sha256">SHA 256</option>
-            <option value="futureDate">Future Date</option>
-            <option value="pastDate">Past Date</option>
-            <option value="boolean">Boolean (1/0)</option>
-          </select>
+          <GeneratorSelect
+          isGenerateDataEnabled={isGenerateDataEnabled}
+          selectedGenerators={selectedGenerators}
+          tableName={tableName}
+          columnName={cell.row.original.COLUMN_NAME}
+          handleGeneratorChange={handleGeneratorChange}
+        />
+    
         ),
+        
       },
     ];
 
@@ -346,19 +306,7 @@ const createTableState = (data, centralValue, parentValue, childValue) => {
             {capitalizeFirstLetter(tableName)}
             <span style={{ marginRight: "2px" }}></span> {/* Add space here */}
             <div className="record-count-badge">
-              <Badge
-                badgeContent={tableData.total_rows || 0} // Number to display inside the badge
-                color="secondary" // Badge color, can be "default", "primary", "secondary", etc.
-                overlap="circular" // Badge will be circular (default behavior)
-                max={1000000}
-                showZero={true}
-                style={{
-                  width: "12px",
-                  height: "12px",
-                  minWidth: "22px",
-                  minHeight: "12px",
-                }}
-              />
+            <CustomBadge totalRows={tableData.total_rows} />
             </div>
           </h2>
 
@@ -379,26 +327,15 @@ const createTableState = (data, centralValue, parentValue, childValue) => {
             </div>
 
             <div className="reusability-slider-container">
-              <Slider
-                defaultValue={30}
-                valueLabelDisplay="auto"
-                aria-label="Percentage Reusage"
-                size="small"
-                disabled={tableData.isCentralTable || !isGenerateDataEnabled}
-                onChange={(e) =>
-                  setReusabilityPct({
-                    ...reusabilityPct,
-                    [tableName]: Number(e.target.value),
-                  })
-                }
-                sx={{
-                  width: 70,
-                  color: "secondary",
-                  "& .MuiSlider-thumb": {
-                    borderRadius: "3px",
-                  },
-                }}
-              />
+            <CustomSlider
+        disabled={tableData.isCentralTable || !isGenerateDataEnabled}
+        onChange={(e) =>
+          setReusabilityPct({
+            ...reusabilityPct,
+            [tableName]: Number(e.target.value),
+          })
+        }
+      />
             </div>
 
             <div className="truncate-table-container">
@@ -419,23 +356,10 @@ const createTableState = (data, centralValue, parentValue, childValue) => {
             />
 
             <span className="generate-data-text">Generate Data</span>
-            <Switch
-              checked={isGenerateDataEnabled || false}
-              onChange={() => handleGenerateDataToggle(tableName)}
-              color="default"
-              sx={{
-                "& .MuiSwitch-track": {
-                  backgroundColor: isGenerateDataEnabled ? "green" : "red", // Track color based on state
-                  borderRadius: 20, // Rounded corners for the track
-                  opacity: 0.51, // Slight opacity for the track when unchecked
-                  transition: "background-color 0.2s ease", // Smooth transition for color change
-                },
-                "& .MuiSwitch-thumb": {
-                  backgroundColor: isGenerateDataEnabled ? "green" : "red", // Optional: make the thumb color consistent
-                  boxShadow: "0 2px 8px rgba(0, 0, 0, 0.3)", // Larger shadow on hover
-                },
-              }}
-            />
+            <CustomSwitch
+        checked={isGenerateDataEnabled || false}
+        onChange={() => handleGenerateDataToggle(tableName)}
+      />
 
             <button
               className="collapse-button"
@@ -610,77 +534,30 @@ const createTableState = (data, centralValue, parentValue, childValue) => {
           placeholder="Enter table name" // Custom placeholder
           label="Table Name" // Custom label
         />
-
-        <LoadingButton
-          sx={{
-            borderRadius: "15px",
-            backgroundColor: isNightMode ? "#333" : "#6200ea", // Dark background for night mode, purple for day mode
-            color: "#fff", // Ensure text is always white for contrast
-            "&:hover": {
-              backgroundColor: isNightMode ? "#444" : "#3700b3", // Lighter shade for hover in night mode
-            },
-            // Adjust spinner color for better visibility
-            "& .MuiCircularProgress-root": {
-              color: "#fff", // Set spinner color to white in both modes
-            },
-            // Make sure the button has proper contrast in night mode
-            boxShadow: isNightMode ? "0px 4px 6px rgba(0, 0, 0, 0.3)" : "none", // Optional shadow to lift the button
-          }}
-          size="small"
-          color="secondary"
-          endIcon={<TbDatabaseSearch />}
-          loadingPosition="end"
-          loading={loadingFetch}
-          variant="contained"
-          onClick={() => {
-            if (tableName.trim() === "") {
-              // Show snackbar or alert about empty table name
-              showSnackbar("Table name cannot be empty!", "warning");
-              return;
-            }
-            // Show confirmation dialog if table name is provided
-            handleOpenDialog(
-              handleFetchMetadata,
-              "Scan Metadata?",
-              "Are you sure you want to scan the database to fetch metadata? This action may take a few moments."
-            );
-          }}
-        >
-          Scan Metadata
-        </LoadingButton>
+        {/* Button for Scanning Metadata */}
+        <CustomLoadingButton
+                isNightMode={isNightMode}
+                loading={loadingFetch}
+                handleOpenDialog={handleOpenDialog}
+                actionFunction={handleFetchMetadata} // Function to call
+                dialogTitle="Scan Metadata?"
+                dialogMessage="Are you sure you want to scan the database to fetch metadata? This action may take a few moments."
+                text="Scan Metadata"
+                icon={<TbDatabaseSearch />}
+              />
 
         {/* <button onClick={generateJsonOutput}>Generate JSON</button> */}
-        <LoadingButton
-          sx={{
-            borderRadius: "15px",
-            backgroundColor: isNightMode ? "#333" : "#6200ea", // Dark background for night mode, purple for day mode
-            color: "#fff", // Ensure text is always white for contrast
-            "&:hover": {
-              backgroundColor: isNightMode ? "#444" : "#3700b3", // Lighter shade for hover in night mode
-            },
-            // Adjust spinner color for better visibility
-            "& .MuiCircularProgress-root": {
-              color: "#fff", // Set spinner color to white in both modes
-            },
-            // Make sure the button has proper contrast in night mode
-            boxShadow: isNightMode ? "0px 4px 6px rgba(0, 0, 0, 0.3)" : "none", // Optional shadow to lift the button
-          }}
-          size="small"
-          color="secondary"
-          endIcon={<TbDatabaseImport />}
-          loadingPosition="end"
-          loading={loadingGenerateSyntheticData}
-          variant="contained"
-          onClick={() =>
-            handleOpenDialog(
-              generateSyntheticData,
-              "Generate Synthetic Data?",
-              "Are you sure you want to generate synthetic data? This action may take a few moments."
-            )
-          }
-        >
-          Generate Synthetic Data
-        </LoadingButton>
+        {/* Button for Generating Synthetic Data */}
+      <CustomLoadingButton
+        isNightMode={isNightMode}
+        loading={loadingGenerateSyntheticData}
+        handleOpenDialog={handleOpenDialog}
+        actionFunction={generateSyntheticData} // Function to call
+        dialogTitle="Generate Synthetic Data?"
+        dialogMessage="Are you sure you want to generate synthetic data? This action may take a few moments."
+        text="Generate Synthetic Data"
+        icon={<TbDatabaseImport />}
+      />
 
         <SnackbarComponent
           open={snackbarOpen}
