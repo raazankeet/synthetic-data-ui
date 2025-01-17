@@ -7,6 +7,7 @@ import { TfiKey } from "react-icons/tfi";
 import { TbDatabaseSearch, TbDatabaseImport } from "react-icons/tb";
 import { GrSettingsOption } from "react-icons/gr";
 import { MdOutlineHelpCenter } from "react-icons/md";
+import { RiRobot2Line } from "react-icons/ri";
 
 // Material UI imports
 import { MaterialReactTable } from "material-react-table";
@@ -361,7 +362,7 @@ console.log(columnDetails);
 
         columns.push({
           accessorKey: "AI Recommendation",
-          header: "AI Recommendation",
+          header: "GenAI Suggestion",
           Cell: ({ cell }) => {
               const columnName = cell.row.original.COLUMN_NAME;
               const columnDetail = columnDetails.find(
@@ -385,6 +386,26 @@ console.log(columnDetails);
                 return <CustomConfidenceBar percentage={columnDetail?.confidence || "not known"}/>
             },
         });
+
+
+        const index = columns.findIndex((col) => col.accessorKey === "GENERATOR");
+        if (index !== -1) {
+          columns[index] = {
+            accessorKey: "GENERATOR",
+            header: "Generator",
+            Cell: ({ cell }) => (
+              <GeneratorSelect
+                isGenerateDataEnabled={isGenerateDataEnabled}
+                selectedGenerators={selectedGenerators}
+                tableName={tableName}
+                columnName={cell.row.original.COLUMN_NAME}
+                handleGeneratorChange={handleGeneratorChange}
+              />
+            ),
+
+
+          };
+        }
 
 
 
@@ -636,8 +657,8 @@ console.log(columnDetails);
   actionFunction={fetchRecommendations}
   dialogTitle="Fetch Recommendations?"
   dialogMessage="Are you sure you want to fetch recommendations based on the current metadata?"
-  text="Get Recommendations"
-  icon={<TbDatabaseSearch />}
+  text="GenAI Reccomendation"
+  icon={<RiRobot2Line/>}
   disabled={!metadata} // Disable button if metadata is not fetched
 />
 

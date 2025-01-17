@@ -19,8 +19,9 @@ const CustomLoadingButton = ({
       "&:hover": { backgroundColor: isNightMode ? "#444" : "#3700b3" },
       "& .MuiCircularProgress-root": { color: "#fff" },
       boxShadow: isNightMode ? "0px 4px 6px rgba(0, 0, 0, 0.3)" : "none",
+      
     }}
-    size="small"
+    size="medium"
     color="secondary"
     endIcon={icon}
     loadingPosition="end"
