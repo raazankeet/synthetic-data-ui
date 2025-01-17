@@ -358,6 +358,21 @@ console.log(columnDetails);
     
 
       if (columnDetails) {
+
+        columns.push({
+          accessorKey: "AI Recommendation",
+          header: "AI Recommendation",
+          Cell: ({ cell }) => {
+              const columnName = cell.row.original.COLUMN_NAME;
+              const columnDetail = columnDetails.find(
+                  (col) => col.COLUMN_NAME === columnName
+              );
+             
+              return <span>{columnDetail?.generator || "N/A"}</span>;
+          },
+      });
+
+
         columns.push({
             accessorKey: "confidence",
             header: "Confidence Score",
@@ -370,6 +385,10 @@ console.log(columnDetails);
                 return <CustomConfidenceBar percentage={columnDetail?.confidence || "not known"}/>
             },
         });
+
+
+
+
     }
     
 
