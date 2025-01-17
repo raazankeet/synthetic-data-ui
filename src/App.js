@@ -171,14 +171,14 @@ const createTableState = (data, centralValue, parentValue, childValue) => {
           }
           return response.json();
         })
-        .then((data) => {
-          setMetadata(data);
+        .then((metadata) => {
+          setMetadata(metadata);
           setLoadingFetch(false);
   
-          setExpandedTables(createTableState(data, false, false, false));  // All tables collapsed initially
-          setGenerateDataState(createTableState(data, true, false, false));  // Central tables set to true, others false
-          setRecordCounts(createTableState(data, 10, 10, 10));  // All tables have 10 records
-          setTruncateTableState(createTableState(data, false, false, false));  // No truncation enabled
+          setExpandedTables(createTableState(metadata, false, false, false));  // All tables collapsed initially
+          setGenerateDataState(createTableState(metadata, true, false, false));  // Central tables set to true, others false
+          setRecordCounts(createTableState(metadata, 10, 10, 10));  // All tables have 10 records
+          setTruncateTableState(createTableState(metadata, false, false, false));  // No truncation enabled
   
         })
         .catch((error) => {
