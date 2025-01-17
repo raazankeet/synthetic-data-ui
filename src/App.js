@@ -60,6 +60,47 @@ const [apiResponse, setApiResponse] = useState(null);
 
 const [isNightMode, setIsNightMode] = useState(false);
 
+const [recommendations, setRecommendations] = useState(null);
+const [loadingRecommendations, setLoadingRecommendations] = useState(false);
+
+const fetchRecommendations = async () => {
+  setLoadingRecommendations(true);
+  
+  if (!metadata) {
+    showSnackbar("Please fetch metadata first!", "warning");
+    setLoadingRecommendations(false);
+    return;
+  }
+
+  console.log(`In fetchRecommendations block, ${metadata}!`);
+  console.log(metadata);
+
+  try {
+    const response = await fetch("http://127.0.0.1:5003/ask", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(metadata), // Using metadata as the body for recommendation
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch recommendations");
+    }
+
+    const recommendations = await response.json();
+    setRecommendations(recommendations); // Store recommendations in state
+    setLoadingRecommendations(false);
+    console.log(recommendations);
+    showSnackbar("Recommendations fetched successfully!", "success");
+  } catch (error) {
+    console.error("Error fetching recommendations:", error);
+    showSnackbar("Error fetching recommendations", "error");
+    setLoadingRecommendations(false);
+  }
+};
+
+
 
   // Toggle day/night mode
   const toggleNightMode = () => {
@@ -250,9 +291,13 @@ const createTableState = (data, centralValue, parentValue, childValue) => {
     }));
   };
 
-  const renderTable = (tableName, tableData) => {
+
+  
+
+  const renderTable = (tableName, tableData, recommendations,sectionName) => {
     const isGenerateDataEnabled = generateDataState[tableName];
 
+  
     // Define columns for Material React Table
     const columns = [
       {
@@ -285,32 +330,52 @@ const createTableState = (data, centralValue, parentValue, childValue) => {
       {
         accessorKey: "GENERATOR",
         header: "Generator",
-
         Cell: ({ cell }) => (
           <GeneratorSelect
-          isGenerateDataEnabled={isGenerateDataEnabled}
-          selectedGenerators={selectedGenerators}
-          tableName={tableName}
-          columnName={cell.row.original.COLUMN_NAME}
-          handleGeneratorChange={handleGeneratorChange}
-        />
-    
+            isGenerateDataEnabled={isGenerateDataEnabled}
+            selectedGenerators={selectedGenerators}
+            tableName={tableName}
+            columnName={cell.row.original.COLUMN_NAME}
+            handleGeneratorChange={handleGeneratorChange}
+          />
         ),
-        
       },
-
-      {
-        accessorKey: "Confidence", 
-        header: "Generator Confidence", 
-        Cell: ({ row }) => (
-          // <div>{selectedGenerators[tableName]?.[row.original.COLUMN_NAME]?.confidence || '-'}%</div> 
-          //  <CustomConfidenceBar percentage={selectedGenerators[tableName]?.[row.original.COLUMN_NAME]?.confidence || 0} />
-          <CustomConfidenceBar percentage={Math.floor(Math.random() * 101)}/>
-        )
-      },
-
     ];
+  
 
+
+    // Add a column for Confidence Score if recommendations exist
+    if (recommendations) {
+     
+      const columnDetails = 
+      recommendations[sectionName].find(table => table.table_name === tableName)?.columns.map(({ COLUMN_NAME, confidence, generator }) => ({
+        COLUMN_NAME,
+        confidence,
+        generator
+    })) || [];
+
+console.log(columnDetails);
+    
+
+      if (columnDetails) {
+        columns.push({
+            accessorKey: "confidence",
+            header: "Confidence Score",
+            Cell: ({ cell }) => {
+                const columnName = cell.row.original.COLUMN_NAME;
+                const columnDetail = columnDetails.find(
+                    (col) => col.COLUMN_NAME === columnName
+                );
+               
+                return <CustomConfidenceBar percentage={columnDetail?.confidence || "not known"}/>
+            },
+        });
+    }
+    
+
+
+    }
+  
     return (
       <div key={tableName} className="table-container">
         <div className="table-header">
@@ -318,57 +383,58 @@ const createTableState = (data, centralValue, parentValue, childValue) => {
             {capitalizeFirstLetter(tableName)}
             <span style={{ marginRight: "2px" }}></span> {/* Add space here */}
             <div className="record-count-badge">
-            <CustomBadge totalRows={tableData.total_rows} />
+              <CustomBadge totalRows={tableData.total_rows} />
             </div>
           </h2>
-
+  
           <div className="header-controls">
             <div className="records-count-container">
               <span>Records to Generate:</span>
               <input
                 type="number"
                 value={recordCounts[tableName] || 10}
-                onChange={(e) =>
-                  handleRecordCountChange(tableName, e.target.value)
-                }
+                onChange={(e) => handleRecordCountChange(tableName, e.target.value)}
                 disabled={!isGenerateDataEnabled}
               />
             </div>
             <div className="reusability-text-container">
               <span>New Keys Reuse % </span>
             </div>
-
+  
             <div className="reusability-slider-container">
-            <CustomSlider
-        disabled={tableData.isCentralTable || !isGenerateDataEnabled}
-        onChange={(e) =>
-          setReusabilityPct({
-            ...reusabilityPct,
-            [tableName]: Number(e.target.value),
-          })
-        }
-      />
+              <CustomSlider
+                disabled={tableData.isCentralTable || !isGenerateDataEnabled}
+                onChange={(e) =>
+                  setReusabilityPct({
+                    ...reusabilityPct,
+                    [tableName]: Number(e.target.value),
+                  })
+                }
+              />
             </div>
-
+  
             <div className="truncate-table-container">
               <label>Truncate Load</label>
             </div>
-
-          <CustomCheckbox
+  
+            <CustomCheckbox
               checked={truncateTableState[tableName] || false}
               onChange={() => handleTruncateTableToggle(tableName)}
             />
-
+  
             <span className="generate-data-text">Generate Data</span>
             <CustomSwitch
-        checked={isGenerateDataEnabled || false}
-        onChange={() => handleGenerateDataToggle(tableName)}
+              checked={isGenerateDataEnabled || false}
+              onChange={() => handleGenerateDataToggle(tableName)}
             />
-
-            <button className="collapse-button" onClick={() => toggleTable(tableName)} >
-              {expandedTables[tableName] ? ( <FaCircleChevronUp size={20} /> ) : ( <FaCircleChevronDown size={20} /> )}
+  
+            <button className="collapse-button" onClick={() => toggleTable(tableName)}>
+              {expandedTables[tableName] ? (
+                <FaCircleChevronUp size={20} />
+              ) : (
+                <FaCircleChevronDown size={20} />
+              )}
             </button>
-
           </div>
         </div>
         <div
@@ -379,13 +445,12 @@ const createTableState = (data, centralValue, parentValue, childValue) => {
           <MaterialReactTable
             columns={columns}
             data={tableData.columns}
-            //enableClickToCopy={true}
             enableColumnPinning={true}
             enableStickyHeader={true}
-            enableFullScreenToggle={true} // Enable full-screen toggle
+            enableFullScreenToggle={true}
             initialState={{
-              pagination: { pageIndex: 0, pageSize: pageSize }, // Set default page size to 5
-              density: "compact", // Set default density to 'comfortable'
+              pagination: { pageIndex: 0, pageSize: pageSize },
+              density: "compact",
             }}
             onFullScreenChange={handleFullScreenChange}
             muiTableBodyRowProps={getRowProps}
@@ -394,6 +459,7 @@ const createTableState = (data, centralValue, parentValue, childValue) => {
       </div>
     );
   };
+  
 
   const getRowProps = ({ row }) => ({
     sx: {
@@ -544,6 +610,18 @@ const createTableState = (data, centralValue, parentValue, childValue) => {
                 icon={<TbDatabaseSearch />}
               />
 
+<CustomLoadingButton
+  isNightMode={isNightMode}
+  loading={loadingRecommendations}
+  handleOpenDialog={handleOpenDialog}
+  actionFunction={fetchRecommendations}
+  dialogTitle="Fetch Recommendations?"
+  dialogMessage="Are you sure you want to fetch recommendations based on the current metadata?"
+  text="Get Recommendations"
+  icon={<TbDatabaseSearch />}
+  disabled={!metadata} // Disable button if metadata is not fetched
+/>
+
         {/* <button onClick={generateJsonOutput}>Generate JSON</button> */}
         {/* Button for Generating Synthetic Data */}
       <CustomLoadingButton
@@ -575,6 +653,7 @@ const createTableState = (data, centralValue, parentValue, childValue) => {
           cancelText="Cancel"
         />
       </div>
+      
       {metadata && (
         <div>
           {metadata.central_table_metadata.length > 0 && (
@@ -582,11 +661,8 @@ const createTableState = (data, centralValue, parentValue, childValue) => {
               <div className="metadata-card">
                 <h3 className="metadata-title">Central Table</h3>
                 {metadata.central_table_metadata.map((table) =>
-                  renderTable(table.table_name, {
-                    ...table,
-                    isCentralTable: true,
-                  })
-                )}
+  renderTable(table.table_name, { ...table, isCentralTable: true }, recommendations,'central_table_metadata')
+)}
               </div>
             </div>
           )}
@@ -595,8 +671,8 @@ const createTableState = (data, centralValue, parentValue, childValue) => {
               <div className="metadata-card">
                 <h3 className="metadata-title">Parent Tables</h3>
                 {metadata.parent_tables_metadata.map((table) =>
-                  renderTable(table.table_name, table)
-                )}
+  renderTable(table.table_name, table, recommendations,'parent_tables_metadata')
+)}
               </div>
             </div>
           )}
@@ -605,8 +681,8 @@ const createTableState = (data, centralValue, parentValue, childValue) => {
               <div className="metadata-card">
                 <h3 className="metadata-title">Child Tables</h3>
                 {metadata.child_tables_metadata.map((table) =>
-                  renderTable(table.table_name, table)
-                )}
+  renderTable(table.table_name, table, recommendations,'child_tables_metadata')
+)}
               </div>
             </div>
           )}
