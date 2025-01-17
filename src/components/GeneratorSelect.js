@@ -6,6 +6,7 @@ const GeneratorSelect = ({
   tableName,
   columnName,
   handleGeneratorChange,
+  defaultGenerator, // Add this prop
 }) => {
   // Define generator options inside the component
   const generatorOptions = {
@@ -47,7 +48,10 @@ const GeneratorSelect = ({
     boolean: 'Boolean (1/0)',
   };
 
-  const currentValue = selectedGenerators[tableName]?.[columnName] || '';
+  // Use the passed defaultGenerator prop if available, else fallback to selectedGenerators logic
+  const currentValue = defaultGenerator || selectedGenerators[tableName]?.[columnName] || '';
+
+console.log(defaultGenerator)
 
   return (
     <select

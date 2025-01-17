@@ -393,15 +393,22 @@ console.log(columnDetails);
           columns[index] = {
             accessorKey: "GENERATOR",
             header: "Generator",
-            Cell: ({ cell }) => (
-              <GeneratorSelect
+            Cell: ({ cell }) => {
+              const columnName = cell.row.original.COLUMN_NAME;
+              const columnDetail = columnDetails.find(
+                  (col) => col.COLUMN_NAME === columnName
+              );
+             
+              // return <span>{columnDetail?.generator || "N/A"}</span>;
+              return <GeneratorSelect
                 isGenerateDataEnabled={isGenerateDataEnabled}
                 selectedGenerators={selectedGenerators}
                 tableName={tableName}
                 columnName={cell.row.original.COLUMN_NAME}
                 handleGeneratorChange={handleGeneratorChange}
+                defaultGenerator={columnDetail?.generator}
               />
-            ),
+          },
 
 
           };
