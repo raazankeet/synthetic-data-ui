@@ -304,8 +304,8 @@ const createTableState = (data, centralValue, parentValue, childValue) => {
         header: "Generator Confidence", 
         Cell: ({ row }) => (
           // <div>{selectedGenerators[tableName]?.[row.original.COLUMN_NAME]?.confidence || '-'}%</div> 
-           <CustomConfidenceBar percentage={selectedGenerators[tableName]?.[row.original.COLUMN_NAME]?.confidence || 0} />
-          // <CustomConfidenceBar percentage={93}/>
+          //  <CustomConfidenceBar percentage={selectedGenerators[tableName]?.[row.original.COLUMN_NAME]?.confidence || 0} />
+          <CustomConfidenceBar percentage={Math.floor(Math.random() * 101)}/>
         )
       },
 
